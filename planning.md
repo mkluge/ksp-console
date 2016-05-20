@@ -26,12 +26,23 @@ buttons
     - Light
     - Gear
     - Brake
+    - Reaction Wheels
+    - precision mode for the joysticks
+  - kerbal buttons
+    - run
+    - jump
+    - grab
+    - eva pack toggle (switch type)
   - button that just kick something off
     - 10x for action groups (light up if action group defined)
     - maybe predefine some action groups like solar panels?
     - Stage
     - Abort
     - Undock
+    - Checkpoint
+    - Load
+    - Chute deploy
+    - Self test all LEDs?
     
 LCD TFT diplays:
   - show fuel and stuff
@@ -41,8 +52,10 @@ LCD TFT diplays:
   - maybe offload to extra ATMega if these take too many cycles 
   
 9-er panel Apollo-style for Warnings and Info:
-  - pins?
+  - pin?
   - Fuel low
   - RCS fuel low
   - Bat low
+  - Temp warn
+  - G-Force warn
   - Parachute safe
