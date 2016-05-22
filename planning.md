@@ -9,7 +9,7 @@ joysticks:
   - 2x GND, 2x 5V
   - one for steering
   - one for translation
-  - attached to primary arduino
+  - attached to primary arduino (latency ...)
   
 slider (10K)
   - for thrust
@@ -22,6 +22,7 @@ flip switches
   - Enable Abort
   - each one needs an "active" LED
   - 4 ports, 4x GND
+  - PCF8754 (number 1)
   
 buttons
   - button that switch a state and light up if enabled
@@ -33,12 +34,16 @@ buttons
     - Reaction Wheels
     - precision mode for the joysticks
     - 7 inputs (7 gnds) and 7 leds (outputs)
+    - will become one [PCF8754]{https://www.conrad.de/de/schnittstellen-ic-e-a-erweiterungen-texas-instruments-pcf8574n-por-ic-100-khz-pdip-16-1047951.html?sc.queryFromSuggest=true} for the Switches
+    - and one for the LEDs, 8 LEDs at 20 mA is OK
+    - (numbers 2 und 3)
   - kerbal buttons
     - run
     - jump
     - grab
     - eva pack toggle (switch type)
     - 4 inputs (4 gnds) and 1 led (output)
+    - one more PCF8754 (number 4)
   - button that just kick something off
     - 10x for action groups (light up if action group defined)
     - 10 inputs (10 gnds) and 10 leds (outputs)
@@ -51,13 +56,13 @@ buttons
     - Chute deploy
     - Self test all LEDs?
     - 7 inputs (7 gnds)
-    
+    - one more PCF8754 (number 5)
 LCD TFT diplays:
   - show fuel and stuff
   - 2 160x128 panels, 1.8", SPI interface
   - 5 pins each, so 10 digital pins
   - 4x 5V (background LEDs), 4x GND
-  - on seconds arduino
+  - on second arduino (slave)
   
 9-er panel Apollo-style for Warnings and Info:
   - pin?
@@ -68,3 +73,4 @@ LCD TFT diplays:
   - G-Force warn
   - Parachute safe
   - 9 inputs (9 gnds)
+  - makes one PCF8754 (number 6)
