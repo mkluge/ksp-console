@@ -34,7 +34,7 @@ buttons
     - Reaction Wheels
     - precision mode for the joysticks
     - 7 inputs (7 gnds) and 7 leds (outputs)
-    - will become one [PCF8754]{https://www.conrad.de/de/schnittstellen-ic-e-a-erweiterungen-texas-instruments-pcf8574n-por-ic-100-khz-pdip-16-1047951.html?sc.queryFromSuggest=true} for the Switches
+    - will become one [PCF8754](https://www.conrad.de/de/schnittstellen-ic-e-a-erweiterungen-texas-instruments-pcf8574n-por-ic-100-khz-pdip-16-1047951.html?sc.queryFromSuggest=true) for the Switches
     - and one for the LEDs, 8 LEDs at 20 mA is OK
     - (numbers 2 und 3)
   - kerbal buttons
