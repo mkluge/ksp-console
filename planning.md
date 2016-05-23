@@ -1,7 +1,7 @@
 general setup:
   - KSP with krpc plugin
   - python client on the PC that talks over the USB/Serial port to an arduino
-  - on another arduino the arduino: buttons, displays, joysticks, ...
+  - on another arduino: buttons, displays, joysticks, ...
 
 joysticks:
   - 2 with 3 axes each
@@ -35,7 +35,7 @@ buttons
     - precision mode for the joysticks
     - 7 inputs (7 gnds) and 7 leds (outputs)
     - will become one [PCF8754](https://www.conrad.de/de/schnittstellen-ic-e-a-erweiterungen-texas-instruments-pcf8574n-por-ic-100-khz-pdip-16-1047951.html?sc.queryFromSuggest=true) for the Switches
-    - and one for the LEDs, 8 LEDs at 20 mA is OK
+    - and one for the LEDs, and one UDN as driver 
     - (numbers 2 und 3)
   - kerbal buttons
     - run
@@ -43,10 +43,10 @@ buttons
     - grab
     - eva pack toggle (switch type)
     - 4 inputs (4 gnds) and 1 led (output)
-    - one more PCF8754 (number 4)
+    - one more PCF8754 (number 4), and one UDN as driver
   - button that just kick something off
     - 10x for action groups (light up if action group defined)
-    - 10 inputs (10 gnds) and 10 leds (outputs)
+    - 10 inputs (10 gnds) and 10 leds (outputs), and one UDN as driver 
     - maybe predefine some action groups like solar panels?
     - Stage
     - Abort
@@ -57,12 +57,14 @@ buttons
     - Self test all LEDs?
     - 7 inputs (7 gnds)
     - one more PCF8754 (number 5)
+
 LCD TFT diplays:
   - show fuel and stuff
   - 2 160x128 panels, 1.8", SPI interface
   - 5 pins each, so 10 digital pins
   - 4x 5V (background LEDs), 4x GND
   - on second arduino (slave)
+  - note: connect both CS signals together to one 
   
 9-er panel Apollo-style for Warnings and Info:
   - pin?
