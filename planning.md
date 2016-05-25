@@ -26,34 +26,35 @@ flip switches
   
 buttons
   - button that switch a state and light up if enabled
-    - RCS
-    - SAS
-    - Light
-    - Gear
-    - Brake
-    - Reaction Wheels
-    - precision mode for the joysticks
+    - RCS (green)
+    - SAS (green)
+    - Light (white)
+    - Gear (white)
+    - Brake (white)
+    - Reaction Wheels (red)
+    - precision mode for the joysticks (blue)
     - 7 inputs (7 gnds) and 7 leds (outputs)
     - will become one [PCF8754](https://www.conrad.de/de/schnittstellen-ic-e-a-erweiterungen-texas-instruments-pcf8574n-por-ic-100-khz-pdip-16-1047951.html?sc.queryFromSuggest=true) for the Switches
     - and one for the LEDs, and one UDN as driver 
     - (numbers 2 und 3)
+    
   - kerbal buttons
     - run
     - jump
     - grab
     - eva pack toggle (switch type)
     - 4 inputs (4 gnds) and 1 led (output)
-    - one more PCF8754 (number 4), and one UDN as driver
+    - one more PCF8754 (number 4), and one UDN port as driver
   - button that just kick something off
-    - 10x for action groups (light up if action group defined)
+    - 10x for action groups (light up if action group defined) (10x white)
     - 10 inputs (10 gnds) and 10 leds (outputs), and one UDN as driver 
     - maybe predefine some action groups like solar panels?
-    - Stage
-    - Abort
-    - Undock
-    - Checkpoint
-    - Load
-    - Chute deploy
+    - Stage (green)
+    - Abort (red?)
+    - Undock (blue)
+    - Checkpoint (white)
+    - Load (red?)
+    - Chute deploy (blue)
     - Self test all LEDs?
     - 7 inputs (7 gnds)
     - one more PCF8754 (number 5)
@@ -67,7 +68,7 @@ LCD TFT diplays:
   - note: connect both CS signals together to one 
   
 9-er panel Apollo-style for Warnings and Info:
-  - pin?
+  - pins per package? voltage?
   - Fuel low
   - RCS fuel low
   - Bat low
