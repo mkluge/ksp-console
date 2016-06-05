@@ -5,7 +5,7 @@
 #define PCF8574_LIB_VERSION "0.1.02"
 
 class LightButton;
-unsigned long debounceDelay = 50;
+#define debounceDelay 50
 
 class PCF8574 {
 public:

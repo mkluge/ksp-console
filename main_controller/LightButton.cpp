@@ -7,11 +7,12 @@
 
 #include "LightButton.h"
 
-LightButton::LightButton(const char* name,
+LightButton::LightButton(const char* button_name,
 		PCF8574& i2c_button_chip,
 		int i2c_button_chip_pin,
 		PCF8574 *i2c_light_chip,
 		int i2c_light_chip_pin) : button_chip(i2c_button_chip) {
+	name = strdup( button_name );
 	button_pin = i2c_button_chip_pin;
 	light_chip = i2c_light_chip;
 	light_pin = i2c_light_chip_pin;
@@ -28,4 +29,8 @@ void LightButton::setLight(bool enable) {
 
 bool LightButton::readState() const {
 	return button_chip.testPin(button_pin);
+}
+
+const char *LightButton::getName() const {
+	return name;
 }

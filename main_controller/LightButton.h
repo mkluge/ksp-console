@@ -20,10 +20,11 @@ public:
 			int i2c_light_chip_pin);
 	virtual ~LightButton();
 	void setLight( bool enable);
-	const char *getName();
+	const char *getName() const;
 	bool readState() const;
 
 private:
+	const char *name;
 	PCF8574 &button_chip;
 	int button_pin;
 	PCF8574 *light_chip;
