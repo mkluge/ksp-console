@@ -8,24 +8,25 @@
 #ifndef LIGHTBUTTON_H_
 #define LIGHTBUTTON_H_
 
+#include "Arduino.h"
 #include "PCF8574.h"
 
 class LightButton {
 public:
 	LightButton( const char *name,
-			const PCF8574 &i2c_button_chip,
+			PCF8574 &i2c_button_chip,
 			int i2c_button_chip_pin,
-			const PCF8574 *i2c_light_chip_address,
+			PCF8574 *i2c_light_chip_address,
 			int i2c_light_chip_pin);
 	virtual ~LightButton();
 	void setLight( bool enable);
 	const char *getName();
-	bool readState();
+	bool readState() const;
 
 private:
-	const PCF8574 &button_chip;
+	PCF8574 &button_chip;
 	int button_pin;
-	const PCF8574 *light_chip;
+	PCF8574 *light_chip;
 	int light_pin;
 };
 

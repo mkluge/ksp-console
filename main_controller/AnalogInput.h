@@ -27,7 +27,7 @@ private:
 	int pin;
 	long reference_value;
 	int last_value;
-	const char *name;
+	char *name;
 };
 
 #endif /* ANALOGINPUT_H_ */

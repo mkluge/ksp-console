@@ -8,8 +8,10 @@
 #include "AnalogInput.h"
 
 AnalogInput::AnalogInput(const char* json_section, int pin) {
-	strdup( json_section, name);
+	name = strdup( json_section );
 	this->pin = pin;
+	last_value = 0;
+	reference_value = 0;
 }
 
 AnalogInput::~AnalogInput() {

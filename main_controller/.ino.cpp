@@ -2,7 +2,7 @@
 //This is a automatic generated file
 //Please do not modify this file
 //If you touch this file your change will be overwritten during the next build
-//This file has been generated on 2016-06-05 12:49:03
+//This file has been generated on 2016-06-05 13:17:57
 
 #include "Arduino.h"
 #include "Arduino.h"
@@ -12,7 +12,7 @@
 #include "LightButton.h"
 #include "PCF8574.h"
 #include "Wire.h"
-bool testAllButtons(JsonObject& root) ;
+void testAllButtons(JsonObject& root) ;
 void setup() ;
 void reset_serial_buffer() ;
 bool check_message() ;

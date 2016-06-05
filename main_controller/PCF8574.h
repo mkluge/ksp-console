@@ -5,7 +5,7 @@
 #define PCF8574_LIB_VERSION "0.1.02"
 
 class LightButton;
-long debounceDelay = 50;
+unsigned long debounceDelay = 50;
 
 class PCF8574 {
 public:
@@ -19,6 +19,8 @@ public:
 	// returns a byte with all bits set to 1 that changed
 	// if there was a stable state change
 	byte updateState();
+	// reads the current state from the pins
+	byte getCurrentSignal();
 	// reset state so that a new state change can be detected
 	void resetState();
 	// tests a pin (debounced)
@@ -42,7 +44,7 @@ private:
 	// last error
 	int last_error;
 	// time of last read
-	long last_update;
+	unsigned long last_update;
 	// the pointer to the button for each pin
 	LightButton *connected_buttons[8];
 };

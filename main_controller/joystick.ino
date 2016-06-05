@@ -19,14 +19,14 @@ char read_buffer[READ_BUFFER_SIZE];
 int read_buffer_offset = 0;
 int empty_buffer_size = 0;
 
-const PCF8574 key_chips[] = {
+PCF8574 key_chips[] = {
 		PCF8574(0x038),
 		PCF8574(0x039),
 		PCF8574(0x040),
 		PCF8574(0x041)
 };
 
-const PCF8574 led_chips[] = {
+PCF8574 led_chips[] = {
 		PCF8574(0x042),
 		PCF8574(0x043)
 };
@@ -40,16 +40,18 @@ const PCF8574 led_chips[] = {
 #define EVA_PACK_BUTTON 5
 #define REACTION_WHEELS_BUTTON 6
 
-const LightButton buttons[] = {
+LightButton buttons[] = {
 		LightButton("stage", key_chips[0], 1, nullptr, 0),
 		LightButton("rcs", key_chips[0], 2, &led_chips[0], 1)
 };
+
+bool interrupt_seen = false;
 
 /**
  * checks all buttons and if anyone changed its state, adds the new state
  * of the botton to the json object
  */
-bool testAllButtons(JsonObject& root) {
+void testAllButtons(JsonObject& root) {
 // update chips
 	for (auto pcf8754 : key_chips) {
 		byte changed_bits;
@@ -177,8 +179,7 @@ void check_for_command() {
 
 		// Lesen, was für hier dabei ist
 		if (!rj.success()) {
-			root["error"] = 2;
-			sendToSlave (root);
+			dieError(2);
 		} else {
 			check_button_enabled(rj, "rcs", RCS_BUTTON);
 			check_button_enabled(rj, "sas", SAS_BUTTON);
@@ -199,13 +200,13 @@ void check_for_command() {
 void loop() {
 	StaticJsonBuffer<400> writeBuffer;
 	JsonObject& root = writeBuffer.createObject();
-	for (auto i in analog_inputs)
+	for (auto i : analog_inputs)
 	{
-		i.readInto( root );
+		i.readInto(root);
 	}
 
 	if (interrupt_seen == true) {
-		testAllButtons();
+		testAllButtons(root);
 		interrupt_seen = false;
 	}
 

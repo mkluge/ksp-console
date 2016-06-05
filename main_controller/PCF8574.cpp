@@ -16,6 +16,7 @@
 //
 
 #include "PCF8574.h"
+#include "Arduino.h"
 #include <Wire.h>
 
 PCF8574::PCF8574(int address) {
@@ -23,23 +24,33 @@ PCF8574::PCF8574(int address) {
 	for (int offset = 0; offset < 8; offset++) {
 		connected_buttons[offset] = NULL;
 	}
+	last_data = 0;
+	last_debounced_data = 0;
+	last_error = 0;
+	last_update = 0;
 }
 
-byte PCF8574::updateState() {
+byte PCF8574::getCurrentSignal()
+{
 	Wire.beginTransmission(chip_hw_address);
 	Wire.requestFrom(chip_hw_address, 1);
 	int current_data = Wire.read();
 	last_error = Wire.endTransmission();
+	return current_data;
+}
+
+byte PCF8574::updateState() {
+	int current_data = getCurrentSignal();
 	// was there a change between the last call of this
 	// function
 	if( last_data != current_data )
 	{
 		// yes -> reset the timer
-		last_update = millies();
+		last_update = millis();
 	}
 	else
 	{
-		if( millies()-last_update > debounceDelay &&
+		if( millis()-last_update > debounceDelay &&
 			last_data != last_debounced_data )
 		{
 			byte modified_bits = last_debounced_data ^ last_data;
@@ -55,7 +66,7 @@ byte PCF8574::getValue() {
 	return last_debounced_data;
 }
 
-LightButon *PCF8574::getButtonForPin(short pin) {
+LightButton *PCF8574::getButtonForPin(short pin) {
 	if (pin < 8) {
 		return connected_buttons[pin];
 	} else {
@@ -63,7 +74,7 @@ LightButon *PCF8574::getButtonForPin(short pin) {
 	}
 }
 
-void PCF8574::setButtonForPin(short pin, LightButon *button) {
+void PCF8574::setButtonForPin(short pin, LightButton *button) {
 	if (pin < 8) {
 		connected_buttons[pin] = button;
 	}
@@ -76,18 +87,18 @@ void PCF8574::write(byte value) {
 	last_error = Wire.endTransmission();
 }
 
-byte PCF8574::testPin(short pin) {
+bool PCF8574::testPin(short pin) {
 	return (last_debounced_data & (1 << pin)) > 0;
 }
 
 void PCF8574::setPin(short pin, bool value) {
-	PCF8574::read8();
+	int data = getCurrentSignal();
 	if (value == LOW) {
-		last_debounced_data &= ~(1 << pin);
+		data &= ~(1 << pin);
 	} else {
-		last_debounced_data |= (1 << pin);
+		data |= (1 << pin);
 	}
-	PCF8574::write8(last_debounced_data);
+	write(data);
 }
 
 int PCF8574::lastError() {
