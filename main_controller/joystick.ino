@@ -1,29 +1,35 @@
 #include "Arduino.h"
 #include "ArduinoJson.h"
 #include "AnalogInput.h"
-#include "PCF8754.h"
 #include "ConsoleSetup.h"
+#include "LightButton.h"
+#include "PCF8574.h"
+#include "Wire.h"
 
-#define NUM_ANALOG_INPUTS 4
-const AnalogInputs &analog_inputs[] = {
+const AnalogInput analog_inputs[] = {
 		AnalogInput("yaw", 2),
 		AnalogInput("pitch", 1),
 		AnalogInput("roll", 0),
 		AnalogInput("thrust", 3)
 };
+int analog_input_count = sizeof(analog_inputs) / sizeof(AnalogInput);
 
 #define READ_BUFFER_SIZE 200
 char read_buffer[READ_BUFFER_SIZE];
 int read_buffer_offset = 0;
 int empty_buffer_size = 0;
 
-const PCF8754 &key_chips[] = {
-		PCF8754(0x038),
-		PCF8754(0x039),
-		PCF8754(0x040),
-		PCF8754(0x041) };
+const PCF8574 key_chips[] = {
+		PCF8574(0x038),
+		PCF8574(0x039),
+		PCF8574(0x040),
+		PCF8574(0x041)
+};
 
-const PCF8754 &led_chips[] = {PCF8754 leds1(0x042), PCF8754 leds2(0x043)};
+const PCF8574 led_chips[] = {
+		PCF8574(0x042),
+		PCF8574(0x043)
+};
 
 // some button indizes for easier handling
 #define STAGE_BUTTON 0
@@ -34,7 +40,7 @@ const PCF8754 &led_chips[] = {PCF8754 leds1(0x042), PCF8754 leds2(0x043)};
 #define EVA_PACK_BUTTON 5
 #define REACTION_WHEELS_BUTTON 6
 
-const LightButton &buttons[] = {
+const LightButton buttons[] = {
 		LightButton("stage", key_chips[0], 1, nullptr, 0),
 		LightButton("rcs", key_chips[0], 2, &led_chips[0], 1)
 };
@@ -46,8 +52,8 @@ const LightButton &buttons[] = {
 bool testAllButtons(JsonObject& root) {
 // update chips
 	for (auto pcf8754 : key_chips) {
-		auto changed_bits;
-		if ((changed_bits = pcf8754->updateState()) == true) {
+		byte changed_bits;
+		if ((changed_bits = pcf8754.updateState()) == true) {
 			// test all bits and update the json for each bit set
 			int current_bit = 0;
 			while (changed_bits != 0) {
@@ -65,14 +71,14 @@ bool testAllButtons(JsonObject& root) {
 void setup() {
 	Serial.begin(38400);
 
-	for (auto i in analog_inputs)
+	for (auto i : analog_inputs)
 	{
 		i.calibrate();
 	}
 
 	empty_buffer_size = Serial.availableForWrite();
 	wait_for_handshake();
-	interruptAttach (MUSSNOZH);
+//	attachInterrupt( 2 );
 }
 
 void reset_serial_buffer() {
@@ -101,11 +107,7 @@ bool check_message() {
 				read_buffer[read_buffer_offset] = inByte;
 				read_buffer_offset++;
 			} else {
-				rj["error"] = 3;
-				sendToSlave (rj);
-				// keep hanging around
-				while (true) {
-				};
+				dieError(3);
 			}
 		}
 	}
@@ -142,17 +144,28 @@ void wait_for_handshake() {
 	}
 }
 
+void dieError(int code)
+		{
+	StaticJsonBuffer<READ_BUFFER_SIZE> buffer;
+	JsonObject& rj = buffer.createObject();
+	rj["error"] = code;
+	sendToSlave(rj);
+	delay(5000);
+	while (1)
+		;
+}
+
 void sendToSlave(JsonObject& message) {
 	Wire.beginTransmission(SLAVE_HW_ADDRESS);
 	message.printTo(Wire);
-	Wire.send('\n');
+	Wire.write('\n');
 	Wire.endTransmission();
 }
 
-void check_button_enabled(JsonObject& root, const char *key, int button_index) {
+void check_button_enabled(JsonObject& rj, const char *key, int button_index) {
 	if (rj.containsKey(key)) {
-		bool state = (root[key] == 1) ? true : false;
-		buttons[button_index]->setLight(state);
+		bool state = (rj[key] == 1) ? true : false;
+		buttons[button_index].setLight(state);
 		rj.remove(key);
 	}
 }

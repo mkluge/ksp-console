@@ -8,14 +8,14 @@
 #ifndef LIGHTBUTTON_H_
 #define LIGHTBUTTON_H_
 
-#include "../ksp-console/PCF8754.h"
+#include "PCF8574.h"
 
 class LightButton {
 public:
 	LightButton( const char *name,
-			const PCF8754 &i2c_button_chip,
+			const PCF8574 &i2c_button_chip,
 			int i2c_button_chip_pin,
-			const PCF8754 &i2c_light_chip_address,
+			const PCF8574 *i2c_light_chip_address,
 			int i2c_light_chip_pin);
 	virtual ~LightButton();
 	void setLight( bool enable);
@@ -23,9 +23,9 @@ public:
 	bool readState();
 
 private:
-	const PCF8754 &button_chip;
+	const PCF8574 &button_chip;
 	int button_pin;
-	const PCF8754 &light_chip;
+	const PCF8574 *light_chip;
 	int light_pin;
 };
 

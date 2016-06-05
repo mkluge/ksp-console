@@ -25,6 +25,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/joystick/include_json}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/joystick/src_include_ledcontrol}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/joystick/UTFT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/libraries/Wire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/src_json}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.1592479552" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
 							</tool>
@@ -36,6 +41,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/joystick/include_json}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/joystick/src_include_ledcontrol}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/joystick/UTFT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/libraries/Wire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/main_controller/src_json}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.1490281088" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
 							</tool>
@@ -62,7 +72,11 @@
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/main_controller"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
 			<target name="clean" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">

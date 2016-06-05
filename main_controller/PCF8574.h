@@ -2,8 +2,6 @@
 #define _PCF8574_H
 
 #include "Arduino.h"
-
-#include "../ksp-console/LightButton.h"
 #define PCF8574_LIB_VERSION "0.1.02"
 
 class LightButton;
