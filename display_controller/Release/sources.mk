@@ -38,5 +38,11 @@ CPP_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 . \
+UTFT \
 core/core \
+libraries/Wire/src \
+libraries/Wire/src/utility \
+src_json/Internals \
+src_json \
+src_ledcontrol \
 

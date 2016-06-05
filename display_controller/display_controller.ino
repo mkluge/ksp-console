@@ -3,6 +3,7 @@
 #include "LedControl.h"
 #include "UTFT.h"
 #include "Wire.h"
+#include "../main_controller/ConsoleSetup.h"
 
 // Declare which fonts we will be using
 //extern uint8_t SmallFont[];
@@ -10,19 +11,18 @@ extern uint8_t BigFont[];
 //extern uint8_t SevenSegNumFont[];
 
 // Belegung für braun = 21
-/*
- #define SCLK 17
- #define MOSI 18
- #define CS   21
- #define DC   19
- #define RESET 20
- */
+ #define SCLK2 17
+ #define MOSI2 18
+ #define CS2   21
+ #define DC2   19
+ #define RESET2 20
+
 // Belegung für braun = 52
-#define SCLK 44
-#define MOSI 46
-#define CS   52
-#define DC   48
-#define RESET 50
+#define SCLK1 44
+#define MOSI1 46
+#define CS1   52
+#define DC1   48
+#define RESET1 50
 
 //UTFT(Model, SDA, SCL, CS, RST[, RS]);
 UTFT lcd1(ST7735, MOSI1, SCLK1, CS1, RESET1, DC1);
@@ -37,7 +37,7 @@ int empty_buffer_size = 0;
 LedControl lc1 = LedControl(4, 3, 2, 1);
 LedControl lc2 = LedControl(7, 6, 5, 1);
 
-void setupLCD( const UTFT &lcd) {
+void setupLCD( UTFT &lcd) {
 	lcd.InitLCD(PORTRAIT);
 	lcd.clrScr();
 	lcd.setColor(200, 255, 200); // red, green, blue
@@ -92,8 +92,8 @@ void print_lc_string(LedControl *target, const char *str) {
 	}
 }
 
-void print_lcd1(char *str) {
-	myGLCD.print(str, LEFT, 0);
+void print_lcd1( UTFT &lcd, char *str) {
+	lcd.print(str, LEFT, 0);
 }
 
 void reset_serial_buffer() {
@@ -103,7 +103,7 @@ void reset_serial_buffer() {
 
 void dieError(int number) {
 	char buf[10];
-	sprint(buf, "%8d", number)
+	sprintf(buf, "%8d", number);
 	print_lc_string(&lc1, "       E");
 	print_lc_string(&lc2, buf);
 // keep hanging around
@@ -121,7 +121,7 @@ bool check_message() {
 		char inByte = 0;
 		while (1) {
 			// just wait for the rest to show up ..
-			while (While.available() == 0)
+			while (Wire.available() == 0)
 				;
 			inByte = Wire.read();
 			if (inByte == '\n') {

@@ -12,6 +12,7 @@
 		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -31,6 +32,26 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>UTFT</name>
+			<type>2</type>
+			<location>C:/Users/mkluge/Documents/Arduino/libraries/UTFT</location>
+		</link>
+		<link>
+			<name>include_json</name>
+			<type>2</type>
+			<location>C:/Users/mkluge/Documents/Arduino/libraries/ArduinoJson/include</location>
+		</link>
+		<link>
+			<name>src_json</name>
+			<type>2</type>
+			<location>C:/Users/mkluge/Documents/Arduino/libraries/ArduinoJson/src</location>
+		</link>
+		<link>
+			<name>src_ledcontrol</name>
+			<type>2</type>
+			<location>C:/Users/mkluge/Documents/Arduino/libraries/LedControl/src</location>
+		</link>
+		<link>
 			<name>core/core</name>
 			<type>2</type>
 			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.11/cores/arduino</location>
@@ -39,6 +60,11 @@
 			<name>core/variant</name>
 			<type>2</type>
 			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.11/variants/standard</location>
+		</link>
+		<link>
+			<name>libraries/Wire</name>
+			<type>2</type>
+			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.11/libraries/Wire</location>
 		</link>
 	</linkedResources>
 </projectDescription>

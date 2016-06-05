@@ -9,7 +9,13 @@ RM := rm -f
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir.mk
+-include src_ledcontrol/subdir.mk
+-include src_json/Internals/subdir.mk
+-include src_json/subdir.mk
+-include libraries/Wire/src/utility/subdir.mk
+-include libraries/Wire/src/subdir.mk
 -include core/core/subdir.mk
+-include UTFT/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -68,31 +74,31 @@ all: display_controller
 display_controller: $(FLASH_IMAGE)
 	@echo 'Building target: $@'
 	@echo 'Printing size:'
-	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-size" -A "C:/Program Files/eclipseArduino/workspace/display_controller/Release/display_controller.elf"
+	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-size" -A "C:/Users/mkluge/Documents/workspace/joystick/display_controller/Release/display_controller.elf"
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 arduino.ar: $(AR_OBJ)
 	@echo 'Starting archiver'
-	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-ar" rcs  "C:/Program Files/eclipseArduino/workspace/display_controller/Release/arduino.ar"    arduino.ar $(AR_OBJ)
+	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-ar" rcs  "C:/Users/mkluge/Documents/workspace/joystick/display_controller/Release/arduino.ar"    arduino.ar $(AR_OBJ)
 	@echo 'Finished building: $@'
 	@echo ' '
 
 display_controller.elf: $(LINK_OBJ) $(AR)
 	@echo 'Starting combiner'
-	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-gcc" -Os -Wl,--gc-sections -mmcu=atmega328p  -o "C:/Program Files/eclipseArduino/workspace/display_controller/Release/display_controller.elf"   $(LINK_OBJ) $(AR)    "-LC:/Program Files/eclipseArduino/workspace/display_controller/Release" -lm
+	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-gcc" -Os -Wl,--gc-sections -mmcu=atmega328p  -o "C:/Users/mkluge/Documents/workspace/joystick/display_controller/Release/display_controller.elf"   $(LINK_OBJ) $(AR)    "-LC:/Users/mkluge/Documents/workspace/joystick/display_controller/Release" -lm
 	@echo 'Finished building: $@'
 	@echo ' '
 
 display_controller.eep: $(ELF)
 	@echo 'Create eeprom image'
-	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-objcopy" -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0  "C:/Program Files/eclipseArduino/workspace/display_controller/Release/display_controller.elf" "C:/Program Files/eclipseArduino/workspace/display_controller/Release/display_controller.eep"
+	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-objcopy" -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0  "C:/Users/mkluge/Documents/workspace/joystick/display_controller/Release/display_controller.elf" "C:/Users/mkluge/Documents/workspace/joystick/display_controller/Release/display_controller.eep"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 display_controller.hex: $(EEP)
 	@echo 'Create Flash image (ihex format)'
-	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-objcopy" -O ihex -R .eeprom  "C:/Program Files/eclipseArduino/workspace/display_controller/Release/display_controller.elf" "C:/Program Files/eclipseArduino/workspace/display_controller/Release/display_controller.hex"
+	"C:\Program Files\eclipseArduino\arduinoPlugin\tools\arduino\avr-gcc\4.8.1-arduino5/bin/avr-objcopy" -O ihex -R .eeprom  "C:/Users/mkluge/Documents/workspace/joystick/display_controller/Release/display_controller.elf" "C:/Users/mkluge/Documents/workspace/joystick/display_controller/Release/display_controller.hex"
 	@echo 'Finished building: $@'
 	@echo ' '
 
