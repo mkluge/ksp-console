@@ -9,8 +9,6 @@ RM := rm -f
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir.mk
--include src_json/Internals/subdir.mk
--include src_json/subdir.mk
 -include src_include_ledcontrol/subdir.mk
 -include libraries/Wire/src/utility/subdir.mk
 -include libraries/Wire/src/subdir.mk

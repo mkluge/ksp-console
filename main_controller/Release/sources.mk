@@ -43,6 +43,4 @@ core/core \
 libraries/Wire/src \
 libraries/Wire/src/utility \
 src_include_ledcontrol \
-src_json/Internals \
-src_json \
 
