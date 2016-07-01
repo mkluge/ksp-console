@@ -10,8 +10,6 @@ RM := rm -f
 -include sources.mk
 -include subdir.mk
 -include src_ledcontrol/subdir.mk
--include src_json/Internals/subdir.mk
--include src_json/subdir.mk
 -include libraries/Wire/src/utility/subdir.mk
 -include libraries/Wire/src/subdir.mk
 -include core/core/subdir.mk

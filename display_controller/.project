@@ -42,11 +42,6 @@
 			<location>C:/Users/mkluge/Documents/Arduino/libraries/ArduinoJson/include</location>
 		</link>
 		<link>
-			<name>src_json</name>
-			<type>2</type>
-			<location>C:/Users/mkluge/Documents/Arduino/libraries/ArduinoJson/src</location>
-		</link>
-		<link>
 			<name>src_ledcontrol</name>
 			<type>2</type>
 			<location>C:/Users/mkluge/Documents/Arduino/libraries/LedControl/src</location>

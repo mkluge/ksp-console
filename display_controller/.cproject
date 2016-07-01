@@ -24,7 +24,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/include_json}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/src_ledcontrol_json}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/src_ledcontrol}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/UTFT}&quot;"/>
 								</option>
@@ -37,7 +36,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/include_json}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/src_ledcontrol_json}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/src_ledcontrol}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/UTFT}&quot;"/>
 								</option>
@@ -66,5 +64,10 @@
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/display_controller"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>
