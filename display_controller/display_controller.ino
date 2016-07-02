@@ -13,7 +13,6 @@ UTFT lcd_left(ST7735, 10,9,8,12,11);
 
 bool write_in_progress = false;
 #define READ_BUFFER_SIZE 200
-char complete_message[READ_BUFFER_SIZE];
 char read_buffer[READ_BUFFER_SIZE];
 int read_buffer_offset = 0;
 int empty_buffer_size = 0;
