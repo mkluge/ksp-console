@@ -26,6 +26,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/include_json}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/src_ledcontrol}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/UTFT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/libraries/SPI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.1003636228" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
 							</tool>
@@ -38,6 +41,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/include_json}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/src_ledcontrol}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/UTFT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/libraries/SPI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/display_controller/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.723577640" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
 							</tool>

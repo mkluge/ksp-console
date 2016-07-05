@@ -2,25 +2,24 @@
 //This is a automatic generated file
 //Please do not modify this file
 //If you touch this file your change will be overwritten during the next build
-//This file has been generated on 2016-07-01 22:03:14
+//This file has been generated on 2016-07-05 21:27:12
 
 #include "Arduino.h"
 #include "Arduino.h"
 #include "ArduinoJson.h"
-#include "UTFT.h"
 #include "Wire.h"
 #include "../main_controller/ConsoleSetup.h"
-void setupLCD( UTFT &lcd) ;
+#include <SPI.h>
+#include "Ucglib.h"
+void setupLCD( LCD_Type &lcd) ;
 void setup() ;
-void print_lcd( UTFT &lcd, int line, const char *str) ;
-void print_lcd( UTFT &lcd, int line, int number) ;
+void print_lcd( LCD_Type &lcd, int line, const char *str) ;
+void print_lcd( LCD_Type &lcd, int line, int number) ;
 void reset_input_buffer() ;
-void reset_message_buffer() ;
 void dieError(int number) ;
-bool check_message() ;
 void receiveEvent(int how_many) ;
 void wait_for_handshake() ;
-void check_for_command() ;
+void work_on_command() ;
 void loop() ;
 
 #include "display_controller.ino"

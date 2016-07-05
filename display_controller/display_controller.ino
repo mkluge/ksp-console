@@ -1,15 +1,17 @@
 #include "Arduino.h"
 #include "ArduinoJson.h"
-#include "UTFT.h"
 #include "Wire.h"
 #include "../main_controller/ConsoleSetup.h"
+#include <SPI.h>
+#include "Ucglib.h"
 
-// declare font
-extern uint8_t SmallFont[];
+#define LCD_Type Ucglib_ST7735_18x128x160_SWSPI
+LCD_Type lcd_right( 1, 2, 3, 0, 4);
+LCD_Type lcd_left( 9, 10, 11, 8, 12);
 
 //UTFT(Model, SDA, SCL, CS, RST[, RS]);
-UTFT lcd_right(ST7735, 2,1,0,4,3);
-UTFT lcd_left(ST7735, 10,9,8,12,11);
+//UTFT lcd_right(ST7735, 2,1,0,4,3);
+//UTFT lcd_left(ST7735, 10,9,8,12,11);
 
 #define READ_BUFFER_SIZE 200
 char read_buffer[READ_BUFFER_SIZE];
@@ -17,12 +19,19 @@ int read_buffer_offset = 0;
 int empty_buffer_size = 0;
 volatile bool have_handshake=false;
 
-void setupLCD( UTFT &lcd) {
-	lcd.InitLCD(PORTRAIT);
-	lcd.clrScr();
-	lcd.setColor(200, 255, 200);
-	lcd.setBackColor(0, 0, 0);
-	lcd.setFont(SmallFont); // 20 rows; 15 characters
+void setupLCD( LCD_Type &lcd) {
+//	lcd.InitLCD(PORTRAIT);
+//	lcd.clrScr();
+//	lcd.setColor(200, 255, 200);
+//	lcd.setBackColor(0, 0, 0);
+//	lcd.setFont(SmallFont); // 20 rows; 15 characters
+	  lcd.begin(UCG_FONT_MODE_TRANSPARENT);
+	  lcd.setRotate180();
+	  lcd.setColor(0, 120, 0, 0);
+	  lcd.setColor(2, 0, 120, 0);
+	  lcd.setColor(1, 120, 0, 120);
+	  lcd.setColor(3, 0, 120, 120);
+	  lcd.clearScreen();
 }
 
 void setup() {	
@@ -34,11 +43,13 @@ void setup() {
 	Wire.begin(SLAVE_HW_ADDRESS);
 }
 
-void print_lcd( UTFT &lcd, int line, const char *str) {
-	lcd.print( str, LEFT, line*10);
+void print_lcd( LCD_Type &lcd, int line, const char *str) {
+	  lcd.setPrintPos(1,line*10);
+	  lcd.setFont(ucg_font_helvB08_tr);
+	  lcd.print(str);
 }
 
-void print_lcd( UTFT &lcd, int line, int number) {
+void print_lcd( LCD_Type &lcd, int line, int number) {
 	char buf[20];
 	sprintf( buf, "%d", number);
 	print_lcd( lcd, line, buf);
@@ -65,8 +76,8 @@ void receiveEvent(int how_many) {
 		char inByte = Wire.read();
 		if ( inByte == '\n' )
 		{
-			workOnCommand();
-			reset_message_buffer();
+			work_on_command();
+			reset_input_buffer();
 		}
 		// otherwise store the current byte
 		if (read_buffer_offset < READ_BUFFER_SIZE) {
@@ -79,6 +90,7 @@ void receiveEvent(int how_many) {
 }
 
 void wait_for_handshake() {
+	static bool dot_on=false;
 	while (!have_handshake) {
 		if (dot_on == true) {
 			print_lcd( lcd_left, 2, ".");
@@ -107,9 +119,9 @@ void work_on_command() {
 				return;
 			}
 			int speed = rj["speed"];
-			print_lcd( lcd_left, speed);
+			print_lcd( lcd_left, 4, speed);
 			int height = rj["height"];
-			print_lcd( lcd_right, height);
+			print_lcd( lcd_left, 5, height);
 		}
 	}
 }

@@ -42,5 +42,4 @@ UTFT \
 core/core \
 libraries/Wire/src \
 libraries/Wire/src/utility \
-src_ledcontrol \
 
