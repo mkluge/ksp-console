@@ -5,32 +5,23 @@
 #include <SPI.h>
 #include "Ucglib.h"
 
-#define LCD_Type Ucglib_ST7735_18x128x160_SWSPI
-LCD_Type lcd_right( 1, 2, 3, 0, 4);
-LCD_Type lcd_left( 9, 10, 11, 8, 12);
-
-//UTFT(Model, SDA, SCL, CS, RST[, RS]);
-//UTFT lcd_right(ST7735, 2,1,0,4,3);
-//UTFT lcd_left(ST7735, 10,9,8,12,11);
+Ucglib_ST7735_18x128x160_SWSPI lcd_right( 1, 2, 3, 0, 4);
+Ucglib_ST7735_18x128x160_SWSPI lcd_left( 9, 10, 11, 8, 12);
 
 #define READ_BUFFER_SIZE 200
 char read_buffer[READ_BUFFER_SIZE];
 int read_buffer_offset = 0;
 int empty_buffer_size = 0;
 volatile bool have_handshake=false;
+volatile bool command_complete=false;
 
-void setupLCD( LCD_Type &lcd) {
-//	lcd.InitLCD(PORTRAIT);
-//	lcd.clrScr();
-//	lcd.setColor(200, 255, 200);
-//	lcd.setBackColor(0, 0, 0);
-//	lcd.setFont(SmallFont); // 20 rows; 15 characters
-	  lcd.begin(UCG_FONT_MODE_TRANSPARENT);
+void setupLCD( Ucglib_ST7735_18x128x160_SWSPI &lcd) {
+	  lcd.begin(UCG_FONT_MODE_SOLID);
 	  lcd.setRotate180();
-	  lcd.setColor(0, 120, 0, 0);
-	  lcd.setColor(2, 0, 120, 0);
-	  lcd.setColor(1, 120, 0, 120);
-	  lcd.setColor(3, 0, 120, 120);
+	  lcd.setColor(0, 255, 255, 255);
+	  lcd.setColor(1, 0, 0, 0);
+//	  lcd.setColor(2, 0, 120, 0);
+//	  lcd.setColor(3, 0, 120, 120);
 	  lcd.clearScreen();
 }
 
@@ -41,15 +32,16 @@ void setup() {
 	reset_input_buffer();
 	Wire.onReceive(receiveEvent);
 	Wire.begin(SLAVE_HW_ADDRESS);
+	delay(100);
 }
 
-void print_lcd( LCD_Type &lcd, int line, const char *str) {
-	  lcd.setPrintPos(1,line*10);
-	  lcd.setFont(ucg_font_helvB08_tr);
+void print_lcd( Ucglib_ST7735_18x128x160_SWSPI &lcd, int line, const char *str) {
+	  lcd.setFont(ucg_font_helvR10_hr);
+	  lcd.setPrintPos(1,20+line*15);
 	  lcd.print(str);
 }
 
-void print_lcd( LCD_Type &lcd, int line, int number) {
+void print_lcd( Ucglib_ST7735_18x128x160_SWSPI &lcd, int line, int number) {
 	char buf[20];
 	sprintf( buf, "%d", number);
 	print_lcd( lcd, line, buf);
@@ -61,46 +53,43 @@ void reset_input_buffer() {
 }
 
 void dieError(int number) {
-	print_lcd( lcd_left, 0, "Error");
+	print_lcd( lcd_left, 0, "Error:");
 	print_lcd( lcd_left, 1, number);
 	// stay here
-	while (true) {
-	};
+	delay(100000);
 }
 
 // read the data into the buffer,
 // if the current input buffer is not full
 void receiveEvent(int how_many) {
+	// in case we already have a full command
+	// => dump
+	if( command_complete )
+	{
+		while( Wire.available()>0 )
+			Wire.read();
+		return;
+	}
 	while( Wire.available()>0 )
 	{
 		char inByte = Wire.read();
-		if ( inByte == '\n' )
+		if ( inByte == 0x00 )
 		{
-			work_on_command();
-			reset_input_buffer();
+			command_complete = true;
+			// dump if there is more one the wire
+			while( Wire.available()>0 )
+				Wire.read();
+			return;
 		}
 		// otherwise store the current byte
 		if (read_buffer_offset < READ_BUFFER_SIZE) {
 			read_buffer_offset++;
 			read_buffer[read_buffer_offset] = inByte;
 		} else {
-			dieError(read_buffer_offset);
+			read_buffer[READ_BUFFER_SIZE-1]=0;
+			command_complete = true;
+			return;
 		}
-	}
-}
-
-void wait_for_handshake() {
-	static bool dot_on=false;
-	while (!have_handshake) {
-		if (dot_on == true) {
-			print_lcd( lcd_left, 2, ".");
-			print_lcd( lcd_right, 2, " ");
-		} else {
-			print_lcd( lcd_right, 2, ".");
-			print_lcd( lcd_left, 2, " ");
-		}
-		dot_on = !dot_on;
-		delay(1000);
 	}
 }
 
@@ -108,16 +97,20 @@ void work_on_command() {
 	StaticJsonBuffer <READ_BUFFER_SIZE> readBuffer;
 	JsonObject& rj = readBuffer.parseObject(read_buffer);
 	if (!rj.success()) {
+		print_lcd( lcd_right, 1, read_buffer);
 		dieError(3);
 	} else {
 		if(!have_handshake)
 		{
 			if (rj["start"] == 2016) {
-				have_handshake=1;
-				print_lcd( lcd_left, 2, " ");
-				print_lcd( lcd_right, 2, " ");
+				have_handshake = true;
+				print_lcd( lcd_left, 2, "Handshake");
+				print_lcd( lcd_right, 2, "   ");
 				return;
 			}
+		}
+		else
+		{
 			int speed = rj["speed"];
 			print_lcd( lcd_left, 4, speed);
 			int height = rj["height"];
@@ -127,7 +120,27 @@ void work_on_command() {
 }
 
 void loop() {
-	wait_for_handshake();
+	static bool dot_on=false;
+
 	while( 1 )
-		delay(1000);
+	{
+		if( command_complete )
+		{
+			work_on_command();
+			reset_input_buffer();
+			command_complete = false;
+		}
+		if( !have_handshake )
+		{
+			if (dot_on == true) {
+				print_lcd( lcd_left, 2, "  .");
+				print_lcd( lcd_right, 2, "   ");
+			} else {
+				print_lcd( lcd_right, 2, "  .");
+				print_lcd( lcd_left, 2, "   ");
+			}
+			dot_on = !dot_on;
+			delay(100);
+		}
+	}
 }

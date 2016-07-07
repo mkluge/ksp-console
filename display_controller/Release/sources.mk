@@ -38,8 +38,10 @@ CPP_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 . \
-UTFT \
 core/core \
+libraries/SPI/src \
 libraries/Wire/src \
 libraries/Wire/src/utility \
+src \
+src/clib \
 

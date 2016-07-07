@@ -32,14 +32,14 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>UTFT</name>
-			<type>2</type>
-			<location>C:/Users/mkluge/Documents/Arduino/libraries/UTFT</location>
-		</link>
-		<link>
 			<name>include_json</name>
 			<type>2</type>
 			<location>C:/Users/mkluge/Documents/Arduino/libraries/ArduinoJson/include</location>
+		</link>
+		<link>
+			<name>src</name>
+			<type>2</type>
+			<location>C:/Users/mkluge/Documents/Arduino/libraries/Ucglib/src</location>
 		</link>
 		<link>
 			<name>core/core</name>
