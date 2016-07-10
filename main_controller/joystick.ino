@@ -27,6 +27,9 @@ unsigned int read_buffer_offset = 0;
 int empty_buffer_size = 0;
 bool have_handshake = false;
 
+// for the two switches
+
+
 #define PCF_BASE_ADDRESS 0x38
 
 PCF8574 *key_chips[] = {
@@ -54,7 +57,7 @@ PCF8574 *led_chips[] = {
 LightButton *buttons[] = {
 		new LightButton("stage", key_chips[0], 4, led_chips[0], 0),
 		new LightButton("rcs", key_chips[0], 5, led_chips[0], 1),
-		new LightButton("sas", key_chips[0], 6, led_chips[0], 2)
+		new LightButton("sas", key_chips[0], 6, led_chips[1], 0)
 };
 
 bool interrupt_seen = false;
@@ -114,6 +117,9 @@ void testAllButtons(JsonObject& root) {
 					LightButton *button = pcf8754->getButtonForPin(current_bit);
 					if( button!=NULL )
 					{
+						// there are two special buttons :)
+						// the two switches on the right top
+
 						// low active inputs
 						root[button->getName()] =
 								(pcf8754->testPin(current_bit)==false) ? 1 : 0;
@@ -252,7 +258,8 @@ void sendToSlave(JsonObject &message) {
 
 void check_button_enabled(JsonObject& rj, const char *key, int button_index) {
 	if (rj.containsKey(key)) {
-		bool state = (rj[key] == 1) ? true : false;
+		int val = rj[key];
+		bool state = (val == 1) ? true : false;
 		buttons[button_index]->setLight(state);
 		rj.remove(key);
 	}
@@ -269,10 +276,20 @@ void check_for_command() {
 		} else {
 			check_button_enabled(rj, "rcs", RCS_BUTTON);
 			check_button_enabled(rj, "sas", SAS_BUTTON);
-			check_button_enabled(rj, "gear", GEAR_BUTTON);
-			check_button_enabled(rj, "light", LIGHT_BUTTON);
-			check_button_enabled(rj, "eva_backpack", EVA_PACK_BUTTON);
-			check_button_enabled(rj, "reaction_wheels", REACTION_WHEELS_BUTTON);
+//			check_button_enabled(rj, "gear", GEAR_BUTTON);
+//			check_button_enabled(rj, "light", LIGHT_BUTTON);
+//			check_button_enabled(rj, "eva_backpack", EVA_PACK_BUTTON);
+//			check_button_enabled(rj, "reaction_wheels", REACTION_WHEELS_BUTTON);
+
+			if (rj.containsKey("speed"))
+			{
+				print_led( led_top, (int) rj["speed"]);
+			}
+			if (rj.containsKey("heigth"))
+			{
+				print_led( led_bottom, (int) rj["height"]);
+			}
+
 
 			// wenn noch lang genug -> display controller
 			if (rj.size() > 0) {
