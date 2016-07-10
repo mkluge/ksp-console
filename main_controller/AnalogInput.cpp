@@ -31,9 +31,11 @@ void AnalogInput::calibrate() {
 
 void AnalogInput::readInto(JsonObject& root) {
 	int val = readValue();
-	if ( val!= last_value )
+	// if it changed for at least 2%
+	if ( abs(val-last_value)>20 )
 	{
 		root[name] = val;
+		last_value = val;
 	}
 }
 

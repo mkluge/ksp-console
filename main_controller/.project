@@ -32,11 +32,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>UTFT</name>
-			<type>2</type>
-			<location>C:/Users/mkluge/Documents/Arduino/libraries/UTFT</location>
-		</link>
-		<link>
 			<name>include</name>
 			<type>2</type>
 			<location>C:/Users/mkluge/Documents/Arduino/libraries/ArduinoJson/include</location>
@@ -47,7 +42,7 @@
 			<location>C:/Users/mkluge/Documents/Arduino/libraries/ArduinoJson/include</location>
 		</link>
 		<link>
-			<name>src_include_ledcontrol</name>
+			<name>src</name>
 			<type>2</type>
 			<location>C:/Users/mkluge/Documents/Arduino/libraries/LedControl/src</location>
 		</link>
@@ -60,6 +55,11 @@
 			<name>core/variant</name>
 			<type>2</type>
 			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.11/variants/mega</location>
+		</link>
+		<link>
+			<name>libraries/SPI</name>
+			<type>2</type>
+			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.11/libraries/SPI</location>
 		</link>
 		<link>
 			<name>libraries/Wire</name>

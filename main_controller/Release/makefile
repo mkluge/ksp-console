@@ -9,11 +9,11 @@ RM := rm -f
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir.mk
--include src_include_ledcontrol/subdir.mk
+-include src/subdir.mk
 -include libraries/Wire/src/utility/subdir.mk
 -include libraries/Wire/src/subdir.mk
+-include libraries/SPI/src/subdir.mk
 -include core/core/subdir.mk
--include UTFT/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)

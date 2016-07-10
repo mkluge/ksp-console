@@ -14,7 +14,7 @@
 class LightButton {
 public:
 	LightButton( const char *name,
-			PCF8574 &i2c_button_chip,
+			PCF8574 *i2c_button_chip,
 			int i2c_button_chip_pin,
 			PCF8574 *i2c_light_chip_address,
 			int i2c_light_chip_pin);
@@ -25,7 +25,7 @@ public:
 
 private:
 	const char *name;
-	PCF8574 &button_chip;
+	PCF8574 *button_chip;
 	int button_pin;
 	PCF8574 *light_chip;
 	int light_pin;

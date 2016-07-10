@@ -24,8 +24,7 @@
  C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/IndentedPrint.hpp \
  C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/JsonWriter.hpp \
  C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/attributes.hpp \
- C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/isInfinity.hpp \
- C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/isNaN.hpp \
+ C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/math.hpp \
  C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/normalize.hpp \
  C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/Encoding.hpp \
  C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/JsonFloat.hpp \
@@ -72,6 +71,7 @@
  ../AnalogInput.h ../ConsoleSetup.h ../LightButton.h ../PCF8574.h \
  C:\Program\ Files\eclipseArduino\arduinoPlugin\packages\arduino\hardware\avr\1.6.11\libraries\Wire\src/Wire.h \
  C:\Program\ Files\eclipseArduino\arduinoPlugin\packages\arduino\hardware\avr\1.6.11\cores\arduino/Stream.h \
+ C:\Users\mkluge\Documents\Arduino\libraries\LedControl\src/LedControl.h \
  ../joystick.ino
 
 C:\Program\ Files\eclipseArduino\arduinoPlugin\packages\arduino\hardware\avr\1.6.11\cores\arduino/Arduino.h:
@@ -124,9 +124,7 @@ C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Inte
 
 C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/attributes.hpp:
 
-C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/isInfinity.hpp:
-
-C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/isNaN.hpp:
+C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/math.hpp:
 
 C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Internals/../Internals/../Polyfills/normalize.hpp:
 
@@ -225,5 +223,7 @@ C:\Users\mkluge\Documents\Arduino\libraries\ArduinoJson\include/ArduinoJson/Inte
 C:\Program\ Files\eclipseArduino\arduinoPlugin\packages\arduino\hardware\avr\1.6.11\libraries\Wire\src/Wire.h:
 
 C:\Program\ Files\eclipseArduino\arduinoPlugin\packages\arduino\hardware\avr\1.6.11\cores\arduino/Stream.h:
+
+C:\Users\mkluge\Documents\Arduino\libraries\LedControl\src/LedControl.h:
 
 ../joystick.ino:
