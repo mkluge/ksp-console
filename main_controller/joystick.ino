@@ -7,6 +7,27 @@
 #include "Wire.h"
 #include "LedControl.h"
 
+/*
+chip(pin)
+
+Schalter rechts: chip5 (4-7)
+15-er rechts: oben 5(1-3),
+              6er mitte 5(0) 4(3-7)
+              6er unten 4(0-2) ???
+
+grau/rot SDA
+viol/brn SCL
+blau INT (19)
+
+Led panel 0-9 : 2(3) 2(4-7) 3(4) 3(0-3)
+4 knöpfe mitte: 0(4-7)
+licht 6(0-1) und 7(0-1)
+
+5 links: oben 1(0) 0(3-7)
+
+ */
+
+
 LedControl *led_top    = new LedControl(5, 7, 6, 1);
 LedControl *led_bottom = new LedControl(10, 12, 11, 1);
 
@@ -57,7 +78,9 @@ PCF8574 *led_chips[] = {
 LightButton *buttons[] = {
 		new LightButton("stage", key_chips[0], 4, led_chips[0], 0),
 		new LightButton("rcs", key_chips[0], 5, led_chips[0], 1),
-		new LightButton("sas", key_chips[0], 6, led_chips[1], 0)
+		new LightButton("sas", key_chips[0], 6, led_chips[1], 0),
+		new LightButton("switch_right", key_chips[4], 6, 0, 0),
+		new LightButton("switch_left", key_chips[4], 7, 0, 0),
 };
 
 bool interrupt_seen = false;
@@ -113,13 +136,10 @@ void testAllButtons(JsonObject& root) {
 			// test all bits and update the json for each bit set
 			int current_bit = 0;
 			while (changed_bits != 0) {
-				if (changed_bits & (1)) {
+				if (changed_bits & (0x01)) {
 					LightButton *button = pcf8754->getButtonForPin(current_bit);
 					if( button!=NULL )
 					{
-						// there are two special buttons :)
-						// the two switches on the right top
-
 						// low active inputs
 						root[button->getName()] =
 								(pcf8754->testPin(current_bit)==false) ? 1 : 0;
@@ -318,6 +338,18 @@ void loop()
 	}
 
 	testAllButtons(root);
+	// there are two special buttons :)
+	// the two switches on the right top
+	if( root.containsKey("switch_right") )
+	{
+		key_chips[4]->setPin( 4, root["switch_right"]);
+	}
+	if( root.containsKey("switch_left") )
+	{
+		key_chips[4]->setPin( 5, root["switch_left"]);
+	}
+
+
 	// if we have data and can send (nothing is in the buffer)
 	if (root.size() > 0 && (Serial.availableForWrite() == empty_buffer_size)) {
 		root.printTo(Serial);

@@ -33,7 +33,7 @@ def normiere_joystick(value):
 def normiere_throttle(value):
 	if value<20:
 		return 0;
-	if value>900:
+	if value>890:
 		return 1;
 	return float(value)/1000.0;
 
@@ -76,6 +76,18 @@ def work_on_json(input_data):
 	try:
 		control = conn.space_center.active_vessel.control
 		data = json.loads(input_data)
+		if "xtrans" in data:
+			value = data["xtrans"]
+			if not args.noksp:
+				control.right = normiere_joystick(value)
+		if "ytrans" in data:
+			value = data["ytrans"]
+			if not args.noksp:
+				control.up = normiere_joystick(value)
+		if "ztrans" in data:
+			value = data["ztrans"]
+			if not args.noksp:
+				control.forward = normiere_joystick(value)
 		if "yaw" in data:
 			value = data["yaw"]
 			if not args.noksp:
