@@ -7,11 +7,12 @@
 
 #include "AnalogInput.h"
 
-AnalogInput::AnalogInput(const char* json_section, int pin) {
+AnalogInput::AnalogInput(const char* json_section, int pin, bool get_diff) {
 	name = strdup( json_section );
 	this->pin = pin;
 	last_value = 0;
 	reference_value = 0;
+	this->get_diff = get_diff;
 }
 
 AnalogInput::~AnalogInput() {
@@ -34,7 +35,14 @@ void AnalogInput::readInto(JsonObject& root) {
 	// if it changed for at least 2%
 	if ( abs(val-last_value)>20 )
 	{
-		root[name] = val;
+		if( get_diff )
+		{
+			root[name] = val-reference_value;
+		}
+		else
+		{
+			root[name] = val;
+		}
 		last_value = val;
 	}
 }
