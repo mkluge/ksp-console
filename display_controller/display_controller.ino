@@ -10,7 +10,7 @@ Ucglib_ST7735_18x128x160_SWSPI lcd_left( 9, 10, 11, 8, 12);
 
 #define READ_BUFFER_SIZE 200
 char read_buffer[READ_BUFFER_SIZE];
-int read_buffer_offset = 0;
+volatile int read_buffer_offset = 0;
 int empty_buffer_size = 0;
 volatile bool have_handshake=false;
 volatile bool command_complete=false;
@@ -41,6 +41,13 @@ void print_lcd( Ucglib_ST7735_18x128x160_SWSPI &lcd, int line, const char *str) 
 	  lcd.print(str);
 }
 
+void print_lcd( Ucglib_ST7735_18x128x160_SWSPI &lcd, int line,
+		        int col, const char c) {
+	  lcd.setFont(ucg_font_helvR10_hr);
+	  lcd.setPrintPos(1+10*col,20+line*15);
+	  lcd.print(c);
+}
+
 void print_lcd( Ucglib_ST7735_18x128x160_SWSPI &lcd, int line, int number) {
 	char buf[20];
 	sprintf( buf, "%d", number);
@@ -62,29 +69,40 @@ void dieError(int number) {
 // read the data into the buffer,
 // if the current input buffer is not full
 void receiveEvent(int how_many) {
+//	static int col=0;
+//	static int line=1;
 	// in case we already have a full command
 	// => dump
-	if( command_complete )
+/*	if( command_complete )
 	{
 		while( Wire.available()>0 )
 			Wire.read();
 		return;
-	}
+	}*/
 	while( Wire.available()>0 )
 	{
 		char inByte = Wire.read();
-		if ( inByte == 0x00 )
+//		if( inByte != '\n' )
+/*			print_lcd( lcd_right, line, col++, inByte);
+		    if (col>7)
+		    {
+		    	col=0;
+		    	line++;
+		    }*/
+		if ( inByte == '\n' )
 		{
 			command_complete = true;
+//			print_lcd( lcd_right, line, col++, read_buffer[0]);
+//			print_lcd( lcd_right, line, col++, '*');
+//			print_lcd( lcd_right, 5, read_buffer_offset);
+//			print_lcd( lcd_right, 6, read_buffer);
 			// dump if there is more one the wire
-			while( Wire.available()>0 )
-				Wire.read();
 			return;
 		}
 		// otherwise store the current byte
 		if (read_buffer_offset < READ_BUFFER_SIZE) {
-			read_buffer_offset++;
-			read_buffer[read_buffer_offset] = inByte;
+//			print_lcd( lcd_right, line, col++, '+');
+			read_buffer[read_buffer_offset++] = inByte;
 		} else {
 			read_buffer[READ_BUFFER_SIZE-1]=0;
 			command_complete = true;
@@ -94,8 +112,8 @@ void receiveEvent(int how_many) {
 }
 
 void work_on_command() {
-	StaticJsonBuffer <READ_BUFFER_SIZE> readBuffer;
-	JsonObject& rj = readBuffer.parseObject(read_buffer);
+	StaticJsonBuffer <READ_BUFFER_SIZE> sjb;
+	JsonObject& rj = sjb.parseObject(read_buffer);
 	if (!rj.success()) {
 		print_lcd( lcd_right, 1, read_buffer);
 		dieError(3);
@@ -111,10 +129,10 @@ void work_on_command() {
 		}
 		else
 		{
-			int speed = rj["speed"];
-			print_lcd( lcd_left, 4, speed);
-			int height = rj["height"];
-			print_lcd( lcd_left, 5, height);
+			if (rj.containsKey("speed"))
+			{
+				print_led( lcd_left, 4, (int) rj["speed"]);
+			}
 		}
 	}
 }
