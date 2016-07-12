@@ -7,16 +7,16 @@
 
 #include "AnalogInput.h"
 
-AnalogInput::AnalogInput(const char* json_section, int pin, bool get_diff) {
-	name = strdup( json_section );
+AnalogInput::AnalogInput(const char *json_section, int pin, bool get_diff) {
+	memset( name, 0, MAX_NAME_LENGTH);
+	strncpy( name, json_section, MAX_NAME_LENGTH);
 	this->pin = pin;
-	last_value = 0;
-	reference_value = 0;
+	this->last_value = 0;
+	this->reference_value = 0;
 	this->get_diff = get_diff;
 }
 
 AnalogInput::~AnalogInput() {
-	free(name);
 }
 
 void AnalogInput::calibrate() {
@@ -43,7 +43,7 @@ void AnalogInput::readInto(JsonObject& root) {
 		{
 			root[name] = val;
 		}
-		last_value = val;
+		this->last_value = val;
 	}
 }
 

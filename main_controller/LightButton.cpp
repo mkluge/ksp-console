@@ -6,13 +6,16 @@
  */
 
 #include "LightButton.h"
+#include <string.h>
 
-LightButton::LightButton(const char* button_name,
+LightButton::LightButton(const char *button_name,
 		PCF8574 *i2c_button_chip,
 		int i2c_button_chip_pin,
 		PCF8574 *i2c_light_chip,
-		int i2c_light_chip_pin) : button_chip(i2c_button_chip) {
-	name = strdup( button_name );
+		int i2c_light_chip_pin) :
+		button_chip(i2c_button_chip) {
+	memset( name, 0, MAX_NAME_LENGTH);
+	strncpy( name, button_name, MAX_NAME_LENGTH);
 	button_pin = i2c_button_chip_pin;
 	light_chip = i2c_light_chip;
 	light_pin = i2c_light_chip_pin;
@@ -31,6 +34,6 @@ bool LightButton::readState() const {
 	return button_chip->testPin(button_pin);
 }
 
-const char *LightButton::getName() const {
+String LightButton::getName() const {
 	return name;
 }
