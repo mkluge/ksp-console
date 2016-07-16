@@ -34,45 +34,51 @@ int empty_buffer_size = 0;
 bool have_handshake = false;
 bool stage_enabled = false;
 #define PCF_BASE_ADDRESS 0x38
+#define LOOP_OVER(X) for( int index=0; index<X; index++)
 
 LedControl led_top(5, 7, 6, 1);
-LedControl led_bottom(10, 12, 11, 1);
+LedControl led_bottom(8, 10, 9, 1);
 
-AnalogInput analog_inputs[] = {
-		AnalogInput("yaw", A5, true),
-		AnalogInput("pitch", A6, true),
-		AnalogInput("roll", A7, true),
-		AnalogInput("xtrans", A2, true),
-		AnalogInput("ytrans", A3, true),
-		AnalogInput("ztrans", A1, true),
-		AnalogInput("thrust", A0, false)
-};
+AnalogInput ai1("yaw", A5, true);
+AnalogInput ai2("pitch", A6, true);
+AnalogInput ai3("roll", A7, true);
+AnalogInput ai4("xtrans", A2, true);
+AnalogInput ai5("ytrans", A3, true);
+AnalogInput ai6("ztrans", A1, true);
+AnalogInput ai7("thrust", A0, false);
 
-PCF8574 key_chips[] = {
-		PCF8574(PCF_BASE_ADDRESS + 0),
-		PCF8574(PCF_BASE_ADDRESS + 1),
-		PCF8574(PCF_BASE_ADDRESS + 2),
-		PCF8574(PCF_BASE_ADDRESS + 3),
-		PCF8574(PCF_BASE_ADDRESS + 4),
-};
+PCF8574 kc1(PCF_BASE_ADDRESS + 0);
+PCF8574 kc2(PCF_BASE_ADDRESS + 1);
+PCF8574 kc3(PCF_BASE_ADDRESS + 2);
+PCF8574 kc4(PCF_BASE_ADDRESS + 3);
+PCF8574 kc5(PCF_BASE_ADDRESS + 4);
 
-PCF8574 led_chips[] = {
-		PCF8574(PCF_BASE_ADDRESS + 5),
-		PCF8574(PCF_BASE_ADDRESS + 6),
-};
+PCF8574 lc1(PCF_BASE_ADDRESS + 5);
+PCF8574 lc2(PCF_BASE_ADDRESS + 6);
 
-LightButton buttons[] = {
-		LightButton("stage", &key_chips[0], 4, &led_chips[0], 0),
-		LightButton("rcs", &key_chips[0], 5, &led_chips[0], 1),
-		LightButton("sas", &key_chips[0], 6, &led_chips[1], 0),
-		LightButton("switch_right", &key_chips[4], 6, 0, 0),
-		LightButton("switch_left", &key_chips[4], 7, 0, 0),
-};
+LightButton lb1("stage", &kc1, 4, &lc1, 0);
+LightButton lb2("rcs", &kc1, 5, &lc1, 1);
+LightButton lb3("sas", &kc1, 6, &lc2, 0);
+LightButton lb4("switch_right", &kc5, 6);
+LightButton lb5("switch_left", &kc5, 7);
 
+#define NUM_ANALOG_BUTTONS 7
 #define NUM_KEY_CHIPS 5
 #define NUM_LED_CHIPS 2
-#define ANALOG_INPUT_COUNT 7
 #define NUM_LIGHT_BUTTONS 5
+
+AnalogInput *analog_inputs[NUM_ANALOG_BUTTONS] = {
+		&ai1, &ai2, &ai3, &ai4, &ai5, &ai6, &ai7
+};
+PCF8574 *key_chips[NUM_KEY_CHIPS] = {
+		&kc1, &kc2, &kc3, &kc4, &kc5
+};
+PCF8574 *led_chips[NUM_LED_CHIPS] = {
+		&lc1, &lc2
+};
+LightButton *buttons[NUM_LIGHT_BUTTONS] = {
+		&lb1, &lb2, &lb3, &lb4, &lb5
+};
 
 // some button indizes for easier handling
 #define STAGE_BUTTON 0
@@ -85,13 +91,13 @@ LightButton buttons[] = {
 
 bool interrupt_seen = false;
 
-void setupLC(LedControl *lc) {
-	lc->shutdown(0, false); // turn off power saving, enables display
-	lc->setIntensity(0, 15); // sets brightness (0~15 possible values)
-	lc->clearDisplay(0); // clear screen
+void setupLC(LedControl &lc, int intensity) {
+	lc.shutdown(0, false); // turn off power saving, enables display
+	lc.setIntensity(0, intensity); // sets brightness (0~15 possible values)
+	lc.clearDisplay(0); // clear screen
 }
 
-void print_led(LedControl &target, long val) {
+void print_led(LedControl *target, long val) {
 
 	int digit = 0;
 	bool negative = (val >= 0) ? false : true;
@@ -100,24 +106,24 @@ void print_led(LedControl &target, long val) {
 	{
 		int last_digit = val % 10;
 		val = val / 10;
-		target.setDigit(0, digit, (byte) last_digit, false);
+		target->setDigit(0, digit, (byte) last_digit, false);
 		digit++;
 	}
 	if (negative && digit < 8) {
-		target.setChar(0, digit, '-', false);
+		target->setChar(0, digit, '-', false);
 		digit++;
 	}
 	while (digit < 8) {
-		target.setChar(0, digit, ' ', false);
+		target->setChar(0, digit, ' ', false);
 		digit++;
 	}
 }
 
-void print_led(LedControl &target, String str) {
-	int len = str.length();
+void print_led(LedControl *target, const char *str) {
+	int len = strlen(str);
 	int digit = 0;
 	while (digit < 8 && len > 0) {
-		target.setChar(0, digit, str[len - 1], false);
+		target->setChar(0, digit, str[len - 1], false);
 		len--;
 		digit++;
 	}
@@ -129,20 +135,20 @@ void print_led(LedControl &target, String str) {
  */
 void testAllButtons(JsonObject& root) {
 // update chips
-	for (int index=0; index<NUM_KEY_CHIPS; index++) {
-		PCF8574 &pcf8754 = key_chips[index];
+	LOOP_OVER(NUM_KEY_CHIPS) {
+		PCF8574 *pcf8754 = key_chips[index];
 		byte changed_bits;
-		if ((changed_bits = pcf8754.updateState()) != 0x00) {
+		if ((changed_bits = pcf8754->updateState()) != 0x00) {
 			// test all bits and update the json for each bit set
 			int current_bit = 0;
 			while (changed_bits != 0) {
 				if (changed_bits & (0x01)) {
-					LightButton *button = pcf8754.getButtonForPin(current_bit);
+					LightButton *button = pcf8754->getButtonForPin(current_bit);
 					if (button != NULL)
 					{
 						// low active inputs
 						root[button->getName()] =
-								(pcf8754.testPin(current_bit) == false) ? 1 : 0;
+								(pcf8754->testPin(current_bit) == false) ? 1 : 0;
 					}
 				}
 				current_bit++;
@@ -154,52 +160,52 @@ void testAllButtons(JsonObject& root) {
 
 void setup() {
 
-	setupLC(&led_top);
-	setupLC(&led_bottom);
-
 	Serial.begin(38400);
 	Wire.begin();
-	for (int index=0; index<NUM_ANALOG_INPUTS; index++)
+
+	setupLC(led_top, 15);
+	setupLC(led_bottom, 3);
+
+	LOOP_OVER(NUM_ANALOG_BUTTONS)
 	{
-		AnalogInput &i = analog_inputs[index];
-		i.calibrate();
+		AnalogInput *i = analog_inputs[index];
+		i->calibrate();
 	}
 
 	// to act as input, all outputs have to be on HIGH
-	for (int index=0; index<NUM_KEY_CHIPS; index++)
+	LOOP_OVER(NUM_KEY_CHIPS)
 	{
-		PCF8574 &key_chip = key_chips[index];
-		key_chip.write(0xFF);
+		PCF8574 *key_chip = key_chips[index];
+		key_chip->write(0xFF);
 	}
 
 	// test lamps
-	for (int index=0; index<NUM_LED_CHIPS; index++)
+	LOOP_OVER(NUM_LED_CHIPS)
 	{
-		PCF8574 &led_chip = led_chips[index];
-		led_chip.write(0xff);
+		PCF8574 *led_chip = led_chips[index];
+		led_chip->write(0xff);
 	}
-	print_led(led_top, 88888888);
-	print_led(led_bottom, 88888888);
+	print_led(&led_top, 88888888);
+	print_led(&led_bottom, 88888888);
 	delay(1000);
-	for (int index=0; index<NUM_LED_CHIPS; index++)
-	{
-		PCF8574 &led_chip = led_chips[index];
-		led_chip.write(0x00);
+	LOOP_OVER(NUM_LED_CHIPS) {
+		PCF8574 *led_chip = led_chips[index];
+		led_chip->write(0x00);
 	}
-	print_led(led_top, "        ");
-	print_led(led_bottom, "        ");
+	print_led(&led_top, "        ");
+	print_led(&led_bottom, "        ");
 	// turn off the two leds
 	// LED rechts
-	key_chips[4].setPin(4, 0);
+	key_chips[4]->setPin(4, 0);
 	// LED links
-	key_chips[4].setPin(5, 0);
+	key_chips[4]->setPin(5, 0);
 
 	pinMode(19, INPUT);
 	empty_buffer_size = Serial.availableForWrite();
 	wait_for_handshake();
 	// wait for the i2c slave to initialize
 	delay(100);
-	print_led(led_top, "--");
+	print_led(&led_top, "--");
 	awakeSlave();
 	delay(100);
 }
@@ -239,16 +245,16 @@ void wait_for_handshake() {
 	while (true) {
 		if (check_message() == false) {
 			if (dot_on == true) {
-				print_led(led_top, "   .");
-				print_led(led_bottom, "    ");
+				print_led(&led_top, "   .");
+				print_led(&led_bottom, "    ");
 			} else {
-				print_led(led_top, "    ");
-				print_led(led_bottom, "   .");
+				print_led(&led_top, "    ");
+				print_led(&led_bottom, "   .");
 			}
 			dot_on = !dot_on;
 			delay(1000);
 		} else {
-			StaticJsonBuffer<READ_BUFFER_SIZE> sjb;
+			DynamicJsonBuffer sjb;
 			JsonObject& rj = sjb.parseObject(read_buffer);
 			// the only way to get this thing going
 			if (rj.success() && rj["start"] == 2016) {
@@ -261,8 +267,8 @@ void wait_for_handshake() {
 }
 
 void dieError(int code) {
-	print_led(led_top, "E");
-	print_led(led_top, code);
+	print_led(&led_top, "E");
+	print_led(&led_bottom, code);
 }
 
 void sendToSlave(JsonObject &message) {
@@ -280,14 +286,14 @@ void check_button_enabled(JsonObject& rj, const char *key, int button_index) {
 	if (rj.containsKey(key)) {
 		int val = rj[key];
 		bool state = (val == 1) ? true : false;
-		buttons[button_index].setLight(state);
+		buttons[button_index]->setLight(state);
 		rj.remove(key);
 	}
 }
 
 void check_for_command() {
 	if (check_message() == true) {
-		StaticJsonBuffer<READ_BUFFER_SIZE> readBuffer;
+		DynamicJsonBuffer readBuffer;
 		JsonObject& rj = readBuffer.parseObject(read_buffer);
 
 		// Lesen, was für hier dabei ist
@@ -302,11 +308,11 @@ void check_for_command() {
 //			check_button_enabled(rj, "reaction_wheels", REACTION_WHEELS_BUTTON);
 
 			if (rj.containsKey("speed")) {
-				print_led(led_top, (int) rj["speed"]);
+				print_led(&led_top, (int) rj["speed"]);
 				rj.remove("speed");
 			}
-			if (rj.containsKey("heigth")) {
-				print_led(led_bottom, (int) rj["height"]);
+			if (rj.containsKey("height")) {
+				print_led(&led_bottom, (int) rj["height"]);
 				rj.remove("height");
 			}
 
@@ -321,7 +327,7 @@ void check_for_command() {
 
 void awakeSlave()
 {
-	StaticJsonBuffer<READ_BUFFER_SIZE> buffer;
+	DynamicJsonBuffer buffer;
 	JsonObject& rj = buffer.createObject();
 	rj["start"] = 2016;
 	sendToSlave(rj);
@@ -329,23 +335,23 @@ void awakeSlave()
 
 void loop()
 {
-	StaticJsonBuffer<400> writeBuffer;
+	DynamicJsonBuffer writeBuffer;
 	JsonObject& root = writeBuffer.createObject();
-	for (int index=0; index<NUM_ANALOG_INPUTS; index++)
+	LOOP_OVER(NUM_ANALOG_BUTTONS)
 	{
-		AnalogInput &i = analog_inputs[index];
-		i.readInto(root);
+		AnalogInput *i = analog_inputs[index];
+		i->readInto(root);
 	}
 	testAllButtons(root);
 	// there are two special buttons :)
 	// the two switches on the right top
 	if (root.containsKey("switch_right")) {
-		key_chips[4].setPin(4, root["switch_right"]);
-		led_chips[0].setPin(0, 1);
+		key_chips[4]->setPin(4, root["switch_right"]);
+		led_chips[0]->setPin(0, 1);
 		stage_enabled = true;
 	}
 	if (root.containsKey("switch_left")) {
-		key_chips[4].setPin(5, root["switch_left"]);
+		key_chips[4]->setPin(5, root["switch_left"]);
 	}
 	// let "stage" only pass if staging is enabled
 	if (root.containsKey("stage") && stage_enabled==false)

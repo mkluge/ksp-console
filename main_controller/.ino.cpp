@@ -2,7 +2,7 @@
 //This is a automatic generated file
 //Please do not modify this file
 //If you touch this file your change will be overwritten during the next build
-//This file has been generated on 2016-07-12 17:27:05
+//This file has been generated on 2016-07-16 12:47:53
 
 #include "Arduino.h"
 #include "Arduino.h"
@@ -13,9 +13,9 @@
 #include "PCF8574.h"
 #include "Wire.h"
 #include "LedControl.h"
-void setupLC(LedControl *lc) ;
-void print_led(LedControl &target, long val) ;
-void print_led(LedControl &target, String str) ;
+void setupLC(LedControl &lc, int intensity) ;
+void print_led(LedControl *target, long val) ;
+void print_led(LedControl *target, const char *str) ;
 void testAllButtons(JsonObject& root) ;
 void setup() ;
 void reset_serial_buffer() ;
