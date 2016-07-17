@@ -45,8 +45,9 @@ def send_handshake():
 def send_serial(send_data):
 	global args
 	data=json.dumps(send_data)+"\n"
-	if args.debug:
-		print("send: "+data)
+	if args.debugsend:
+		print("send: "+json.dumps(send_data))
+		sys.stdout.flush()
 	ser.write(data.encode('iso8859-1'))
 
 def send_flight_data():
@@ -65,14 +66,45 @@ def send_flight_data():
 			send_data["speed"] = int(vessel.flight(vessel.orbit.body.reference_frame).speed)
 			send_data["sas"] = int(control.sas)
 			send_data["rcs"] = int(control.rcs)
-			send_data["ap"] = int(orbit.apoapsis_altitude)
-			send_data["ap_t"] = int(orbit.time_to_apoapsis)
-			send_data["pe"] = int(orbit.periapsis_altitude)
-			send_data["pe_t"] = int(orbit.time_to_periapsis)
 			send_serial(send_data)
 			status_updates={}
 		except krpc.error.RPCError:
 		 	pass
+
+def time_to_string(secs):
+	if secs<0:
+		return "n/a"
+	tap = ""
+	if secs>60:
+		mins = int(secs/60)
+		tap = str(mins)+ " min"
+		if mins<5:
+			tap = tap+", "+str(secs-(mins*60))+" sec"
+	else:
+		tap = str(int(secs)) + " sec"
+	return tap
+
+def add_orbit_to_status():
+	global args
+	global status_updates
+	global conn
+	if not args.noksp:
+		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+			return
+		try:
+			orbit = conn.space_center.active_vessel.orbit
+			status_updates["ap"] = int(orbit.apoapsis_altitude)
+			status_updates["ap_t"] = time_to_string(int(orbit.time_to_apoapsis))
+			if orbit.periapsis_altitude>0:
+				status_updates["pe"] = int(orbit.periapsis_altitude)
+				status_updates["pe_t"] = time_to_string(int(orbit.time_to_periapsis))
+			else:
+				status_updates["pe"] = "n/a"
+				status_updates["pe_t"] = "n/a"
+		except krpc.error.RPCError:
+		 	pass
+		except ValueError:
+		  	pass
 
 def work_on_json(input_data):
 	global args
@@ -136,12 +168,11 @@ def work_on_json(input_data):
 
 last_chip_data = 0
 parser = argparse.ArgumentParser()
-parser.add_argument("--debug", help="print some debug output", action="store_true")
+parser.add_argument("--debugsend", help="print data sent to con", action="store_true")
+parser.add_argument("--debugrecv", help="print some received from con", action="store_true")
 parser.add_argument("--debugchip", help="print chip debug output", action="store_true")
 parser.add_argument("--noksp", help="run without connecting to ksp", action="store_true")
 args = parser.parse_args()
-if args.debug:
-	print("debug: will print a lot of debug output")
 if args.noksp:
 	print("noksp: will not connect to KSP")
 
@@ -149,13 +180,14 @@ ser = serial.Serial(port, 38400, timeout=0)
 if not args.noksp:
 	conn = krpc.connect(name='mk console')
 sleep(3)
-ref_time = datetime.datetime.now()
+ref_time_short = datetime.datetime.now()
+ref_time_long = datetime.datetime.now()
 send_handshake()
 while True:
 	check_serial()
 	lines=serial_data.split("\n",1)
 	if len(lines)==2: # means we have a full line
-		if args.debug:
+		if args.debugrecv:
 			print( lines[0] )
 			sys.stdout.flush()
 		serial_data = lines[1]
@@ -171,7 +203,11 @@ while True:
 				print('Decoding JSON failed for: '+lines[0])
 		work_on_json(lines[0])
 	now = datetime.datetime.now()
-	diff = now - ref_time
-	if (diff.seconds>0 or diff.microseconds>200000) and ser.out_waiting == 0:
+	diff_short = now - ref_time_short
+	diff_long  = now - ref_time_long
+	if (diff_short.seconds>0 or diff_short.microseconds>200000) and ser.out_waiting == 0:
+		if diff_long.seconds>1:
+			add_orbit_to_status()
+			ref_time_long = datetime.datetime.now()
 		send_flight_data()
-		ref_time = datetime.datetime.now()
+		ref_time_short = datetime.datetime.now()
