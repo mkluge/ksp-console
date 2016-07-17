@@ -27,7 +27,7 @@
 
  */
 
-#define READ_BUFFER_SIZE 200
+#define READ_BUFFER_SIZE 400
 char read_buffer[READ_BUFFER_SIZE];
 unsigned int read_buffer_offset = 0;
 int empty_buffer_size = 0;
@@ -35,6 +35,7 @@ bool have_handshake = false;
 bool stage_enabled = false;
 #define PCF_BASE_ADDRESS 0x38
 #define LOOP_OVER(X) for( int index=0; index<X; index++)
+
 
 LedControl led_top(5, 7, 6, 1);
 LedControl led_bottom(8, 10, 9, 1);
@@ -139,9 +140,7 @@ void testAllButtons(JsonObject& root) {
 	LOOP_OVER(NUM_KEY_CHIPS) {
 		PCF8574 *pcf8754 = key_chips[index];
 		byte changed_bits=0x00;
-		byte saved_bits=0x00;
 		if ((changed_bits = pcf8754->updateState()) != 0x00) {
-			saved_bits = changed_bits;
 			// test all bits and update the json for each bit set
 			int current_bit = 0;
 			while (changed_bits != 0) {
@@ -165,6 +164,7 @@ void setup() {
 
 	Serial.begin(38400);
 	Wire.begin();
+	awakeSlave();
 
 	setupLC(led_top, 15);
 	setupLC(led_bottom, 3);
@@ -223,7 +223,6 @@ void setup() {
 	// wait for the i2c slave to initialize
 	delay(100);
 	print_led(&led_top, "--");
-	awakeSlave();
 	delay(100);
 }
 
@@ -284,19 +283,28 @@ void wait_for_handshake() {
 }
 
 void dieError(int code) {
-	print_led(&led_top, "E");
+	print_led(&led_top, "EEEEEEEE");
 	print_led(&led_bottom, code);
 }
 
 void sendToSlave(JsonObject &message) {
-	char buf[200];
-	memset(buf, 0, 200);
-	message.printTo(buf, 200);
-	buf[198] = 0;
-	Wire.beginTransmission(SLAVE_HW_ADDRESS);
-	Wire.write(buf);
-	Wire.write('\n');
-	Wire.endTransmission();
+	int len=message.measureLength();
+	char buf[400];
+	memset(buf, 0, 400);
+	message.printTo(buf, 400);
+	buf[len] = '\n';
+	len++;
+	char *ptr=buf;
+	// need to send in 32 byte chunks
+	while( len>0 )
+	{
+		int send_len = (len>32) ? 32 : len;
+		Wire.beginTransmission(SLAVE_HW_ADDRESS);
+		Wire.write(ptr, send_len);
+		Wire.endTransmission();
+		len -= send_len;
+		ptr += send_len;
+	}
 }
 
 void check_button_enabled(JsonObject& rj, const char *key, int button_index) {
@@ -322,14 +330,14 @@ void check_for_command() {
 //			check_button_enabled(rj, "gear", GEAR_BUTTON);
 //			check_button_enabled(rj, "light", LIGHT_BUTTON);
 //			check_button_enabled(rj, "eva_backpack", EVA_PACK_BUTTON);
-//			check_button_enabled(rj, "reaction_wheels", REACTION_WHEELS_BUTTON);
+//			check_button_enab+led(rj, "reaction_wheels", REACTION_WHEELS_BUTTON);
 
 			if (rj.containsKey("speed")) {
-				print_led(&led_top, (int) rj["speed"]);
+				print_led(&led_top, (long) rj["speed"]);
 				rj.remove("speed");
 			}
 			if (rj.containsKey("height")) {
-				print_led(&led_bottom, (int) rj["height"]);
+				print_led(&led_bottom, (long) rj["height"]);
 				rj.remove("height");
 			}
 
@@ -344,7 +352,7 @@ void check_for_command() {
 
 void awakeSlave()
 {
-	DynamicJsonBuffer buffer;
+	StaticJsonBuffer<READ_BUFFER_SIZE> buffer;
 	JsonObject& rj = buffer.createObject();
 	rj["start"] = 2016;
 	sendToSlave(rj);
@@ -352,7 +360,7 @@ void awakeSlave()
 
 void loop()
 {
-	DynamicJsonBuffer writeBuffer;
+	StaticJsonBuffer<READ_BUFFER_SIZE> writeBuffer;
 	JsonObject& root = writeBuffer.createObject();
 	LOOP_OVER(NUM_ANALOG_BUTTONS)
 	{
