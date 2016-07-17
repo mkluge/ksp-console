@@ -1,1 +1,4 @@
+/Release/*
 /Release/
+.settings/
+.ino.cpp
