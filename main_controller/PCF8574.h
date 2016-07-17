@@ -30,11 +30,14 @@ public:
 
 	void write(byte value);
 	void setPin(short pin, bool value);
+	void setInputMask( byte mask);
 	long lastUpdate();
-
+	byte getInputMask();
 	int lastError();
 
 private:
+	// the bits that are 0 are used as inputs
+	byte input_mask;
 	// the HW address on the I2C bus
 	int chip_hw_address;
 	// the last 8 bytes read

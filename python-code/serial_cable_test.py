@@ -43,7 +43,10 @@ def send_handshake():
 	send_serial(send_data)
 
 def send_serial(send_data):
+	global args
 	data=json.dumps(send_data)+"\n"
+	if args.debug:
+		print("send: "+data)
 	ser.write(data.encode('iso8859-1'))
 
 def send_flight_data():
@@ -55,12 +58,17 @@ def send_flight_data():
 			return
 		try:
 			vessel = conn.space_center.active_vessel
-			control = conn.space_center.active_vessel.control
+			control = vessel.control
+			orbit = vessel.orbit
 			send_data = status_updates
 			send_data["height"] = int(vessel.flight().surface_altitude)
 			send_data["speed"] = int(vessel.flight(vessel.orbit.body.reference_frame).speed)
 			send_data["sas"] = int(control.sas)
 			send_data["rcs"] = int(control.rcs)
+			send_data["ap"] = int(orbit.apoapsis_altitude)
+			send_data["ap_t"] = int(orbit.time_to_apoapsis)
+			send_data["pe"] = int(orbit.periapsis_altitude)
+			send_data["pe_t"] = int(orbit.time_to_periapsis)
 			send_serial(send_data)
 			status_updates={}
 		except krpc.error.RPCError:
@@ -71,10 +79,12 @@ def work_on_json(input_data):
 	global status_updates
 	global conn
 
-	if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
-		return
+	if not args.noksp:
+		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+			return
 	try:
-		control = conn.space_center.active_vessel.control
+		if not args.noksp:
+			control = conn.space_center.active_vessel.control
 		data = json.loads(input_data)
 		if "xtrans" in data:
 			value = data["xtrans"]
@@ -124,8 +134,10 @@ def work_on_json(input_data):
 
 ## main
 
+last_chip_data = 0
 parser = argparse.ArgumentParser()
 parser.add_argument("--debug", help="print some debug output", action="store_true")
+parser.add_argument("--debugchip", help="print chip debug output", action="store_true")
 parser.add_argument("--noksp", help="run without connecting to ksp", action="store_true")
 args = parser.parse_args()
 if args.debug:
@@ -147,6 +159,16 @@ while True:
 			print( lines[0] )
 			sys.stdout.flush()
 		serial_data = lines[1]
+		if args.debugchip:
+			try:
+				data = json.loads(lines[0])
+				if "chip" in data:
+					if data["chip"]!=last_chip_data:
+						print("Chip: "+str(data["chip"]))
+						last_chip_data = data["chip"]
+				sys.stdout.flush()
+			except ValueError:
+				print('Decoding JSON failed for: '+lines[0])
 		work_on_json(lines[0])
 	now = datetime.datetime.now()
 	diff = now - ref_time

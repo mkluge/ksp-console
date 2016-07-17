@@ -59,13 +59,14 @@ PCF8574 lc2(PCF_BASE_ADDRESS + 6);
 LightButton lb1("stage", &kc1, 4, &lc1, 0);
 LightButton lb2("rcs", &kc1, 5, &lc1, 1);
 LightButton lb3("sas", &kc1, 6, &lc2, 0);
-LightButton lb4("switch_right", &kc5, 6);
-LightButton lb5("switch_left", &kc5, 7);
+LightButton lb4("gear", &kc1, 7, &lc2, 1);
+LightButton lb5("switch_right", &kc5, 6);
+LightButton lb6("switch_left", &kc5, 7);
 
 #define NUM_ANALOG_BUTTONS 7
 #define NUM_KEY_CHIPS 5
 #define NUM_LED_CHIPS 2
-#define NUM_LIGHT_BUTTONS 5
+#define NUM_LIGHT_BUTTONS 6
 
 AnalogInput *analog_inputs[NUM_ANALOG_BUTTONS] = {
 		&ai1, &ai2, &ai3, &ai4, &ai5, &ai6, &ai7
@@ -77,7 +78,7 @@ PCF8574 *led_chips[NUM_LED_CHIPS] = {
 		&lc1, &lc2
 };
 LightButton *buttons[NUM_LIGHT_BUTTONS] = {
-		&lb1, &lb2, &lb3, &lb4, &lb5
+		&lb1, &lb2, &lb3, &lb4, &lb5, &lb6
 };
 
 // some button indizes for easier handling
@@ -137,8 +138,10 @@ void testAllButtons(JsonObject& root) {
 // update chips
 	LOOP_OVER(NUM_KEY_CHIPS) {
 		PCF8574 *pcf8754 = key_chips[index];
-		byte changed_bits;
+		byte changed_bits=0x00;
+		byte saved_bits=0x00;
 		if ((changed_bits = pcf8754->updateState()) != 0x00) {
+			saved_bits = changed_bits;
 			// test all bits and update the json for each bit set
 			int current_bit = 0;
 			while (changed_bits != 0) {
@@ -194,11 +197,25 @@ void setup() {
 	}
 	print_led(&led_top, "        ");
 	print_led(&led_bottom, "        ");
+	// led chips have outputs only
+	lc1.setInputMask( 0x00 );
+	lc2.setInputMask( 0x00 );
+	// first 4 chips have all pins as inputs
+	kc1.setInputMask( 0xff );
+	kc2.setInputMask( 0xff );
+	kc3.setInputMask( 0xff );
+	kc4.setInputMask( 0xff );
+	// set input mask for chip 4, all inputs except
+	// unset bits 4 and 5 for the two leds
+	byte kc5_mask = 0xff;
+	kc5_mask &= ~(1<<4);
+	kc5_mask &= ~(1<<5);
+	kc5.setInputMask( kc5_mask );
 	// turn off the two leds
 	// LED rechts
-	key_chips[4]->setPin(4, 0);
+	kc5.setPin(4, 0);
 	// LED links
-	key_chips[4]->setPin(5, 0);
+	kc5.setPin(5, 0);
 
 	pinMode(19, INPUT);
 	empty_buffer_size = Serial.availableForWrite();
@@ -347,17 +364,18 @@ void loop()
 	// the two switches on the right top
 	if (root.containsKey("switch_right")) {
 		key_chips[4]->setPin(4, root["switch_right"]);
-		led_chips[0]->setPin(0, 1);
-		stage_enabled = true;
+		led_chips[0]->setPin(0, root["switch_right"]);
+		stage_enabled = root["switch_right"];
 	}
 	if (root.containsKey("switch_left")) {
-		key_chips[4]->setPin(5, root["switch_left"]);
+		kc5.setPin( 5, root["switch_left"]);
 	}
 	// let "stage" only pass if staging is enabled
 	if (root.containsKey("stage") && stage_enabled==false)
 	{
 		root.remove("stage");
 	}
+//	root["chip"]=kc5.getCurrentSignal();
 
 	// if we have data and can send (nothing is in the buffer)
 	if (root.size() > 0 && (Serial.availableForWrite() == empty_buffer_size)) {

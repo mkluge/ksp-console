@@ -28,21 +28,31 @@ PCF8574::PCF8574(int address) {
 	last_debounced_data = 0;
 	last_error = 0;
 	last_update = 0;
+	input_mask = 0xff;
 }
 
 byte PCF8574::getCurrentSignal()
 {
-	Wire.beginTransmission(chip_hw_address);
+//	Wire.beginTransmission(chip_hw_address);
 	Wire.requestFrom(chip_hw_address, 1);
 	int current_data = Wire.read();
-	last_error = Wire.endTransmission();
+//	last_error = Wire.endTransmission();
 	return current_data;
 }
 
+void PCF8574::setInputMask( byte mask) {
+	// clear this bit in the input mask
+	input_mask = mask;
+}
+
+byte PCF8574::getInputMask() {
+	return input_mask;
+}
+
 byte PCF8574::updateState() {
-	int current_data = getCurrentSignal();
-	// was there a change between the last call of this
-	// function
+	byte current_data = getCurrentSignal();
+	// make bits that are used as outputs to show up as zeros
+	current_data &= input_mask;
 	if( last_data != current_data )
 	{
 		// yes -> reset the timer
@@ -92,13 +102,21 @@ bool PCF8574::testPin(short pin) {
 }
 
 void PCF8574::setPin(short pin, bool value) {
-	int data = getCurrentSignal();
+	byte new_data = this->getCurrentSignal();
 	if (value == LOW) {
-		data &= ~(1 << pin);
+		new_data &= ~(1 << pin);
 	} else {
-		data |= (1 << pin);
+		new_data |= (1 << pin);
 	}
-	write(data);
+	// in this function you can only set pins to 0 that
+	// are also 0 in the input mask, input pins have
+	// always to stay high
+	new_data |= input_mask;
+	// remember the byte written as current data
+	// but mask out the output bytes
+	write(new_data);
+	last_debounced_data = new_data & input_mask;
+	updateState();
 }
 
 int PCF8574::lastError() {
