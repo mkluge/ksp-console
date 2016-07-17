@@ -36,9 +36,12 @@ void setup() {
 }
 
 void print_lcd( Ucglib_ST7735_18x128x160_SWSPI &lcd, int line, const char *str) {
-	  lcd.setFont(ucg_font_helvR10_hr);
-	  lcd.setPrintPos(1,20+line*15);
-	  lcd.print(str);
+	  lcd.setFont(ucg_font_9x15_mf);
+	  lcd.setPrintPos(1,20+line*18);
+	  char buf[20];
+	  snprintf( buf, 15, "%13s", str);
+	  buf[14]=0;
+	  lcd.print(buf);
 }
 
 void print_lcd( Ucglib_ST7735_18x128x160_SWSPI &lcd, int line,
@@ -62,8 +65,6 @@ void reset_input_buffer() {
 void dieError(int number) {
 	print_lcd( lcd_left, 0, "Error:");
 	print_lcd( lcd_left, 1, number);
-	// stay here
-	delay(100000);
 }
 
 // read the data into the buffer,
@@ -102,20 +103,24 @@ void receiveEvent(int how_many) {
 		// otherwise store the current byte
 		if (read_buffer_offset < READ_BUFFER_SIZE) {
 //			print_lcd( lcd_right, line, col++, '+');
-			read_buffer[read_buffer_offset++] = inByte;
+			read_buffer[read_buffer_offset] = inByte;
+			read_buffer_offset++;
 		} else {
 			read_buffer[READ_BUFFER_SIZE-1]=0;
+			dieError(4);
 			command_complete = true;
 			return;
 		}
 	}
 }
 
-void work_on_command() {
-	StaticJsonBuffer <READ_BUFFER_SIZE> sjb;
-	JsonObject& rj = sjb.parseObject(read_buffer);
+#define CHECK_DATA(KEY,LCD,LINE) \
+		if (rj.containsKey(KEY)) { \
+			print_lcd( LCD, LINE, (const char *) rj[KEY]); }
+
+void work_on_command(JsonObject& rj) {
 	if (!rj.success()) {
-		print_lcd( lcd_right, 1, read_buffer);
+		print_lcd( lcd_left, 4, read_buffer);
 		dieError(3);
 	} else {
 		if(!have_handshake)
@@ -123,29 +128,39 @@ void work_on_command() {
 			if (rj["start"] == 2016) {
 				have_handshake = true;
 				print_lcd( lcd_left, 2, "Handshake");
-				print_lcd( lcd_right, 2, "   ");
+				print_lcd( lcd_right, 0, "Apoapsis");
+				print_lcd( lcd_right, 2, "time to AP");
+				print_lcd( lcd_right, 4, "Periapsis");
+				print_lcd( lcd_right, 6, "time to PE");
 				return;
 			}
 		}
 		else
 		{
-			if (rj.containsKey("speed"))
-			{
-				print_led( lcd_left, 4, (int) rj["speed"]);
-			}
+			CHECK_DATA( "ap", lcd_right, 1);
+			CHECK_DATA( "ap_t", lcd_right, 3);
+			CHECK_DATA( "pe", lcd_right, 5);
+			CHECK_DATA( "pe_t", lcd_right, 7);
 		}
 	}
 }
 
 void loop() {
 	static bool dot_on=false;
+	static int completed_commands=0;
 
 	while( 1 )
 	{
 		if( command_complete )
 		{
-			work_on_command();
+			char mybuf[READ_BUFFER_SIZE];
+			memcpy( mybuf, read_buffer, READ_BUFFER_SIZE);
 			reset_input_buffer();
+			StaticJsonBuffer <READ_BUFFER_SIZE> sjb;
+			JsonObject& rj = sjb.parseObject(mybuf);
+			completed_commands++;
+			print_lcd( lcd_left, 5, completed_commands);
+			work_on_command(rj);
 			command_complete = false;
 		}
 		if( !have_handshake )
