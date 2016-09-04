@@ -21,9 +21,9 @@
 
  Led panel 0-9 : 2(3) 2(4-7) 3(4) 3(0-3)
  4 knöpfe mitte: 0(4-7)
- licht 6(0-1) und 7(0-1)
+ licht 6(0-7) und 7(0-7)
 
- 5 links: oben 1(0) 0(3-7)
+ 5 links: oben 1(0) 1(3-7); 3 statt 0??;
 
  */
 
@@ -35,7 +35,6 @@ bool have_handshake = false;
 bool stage_enabled = false;
 #define PCF_BASE_ADDRESS 0x38
 #define LOOP_OVER(X) for( int index=0; index<X; index++)
-
 
 LedControl led_top(5, 7, 6, 1);
 LedControl led_bottom(8, 10, 9, 1);
@@ -63,11 +62,13 @@ LightButton lb3("sas", &kc1, 6, &lc2, 0);
 LightButton lb4("gear", &kc1, 7, &lc2, 1);
 LightButton lb5("switch_right", &kc5, 6);
 LightButton lb6("switch_left", &kc5, 7);
+LightButton lb7("lights", &kc2, 7, NULL, 0);
+LightButton lb8("breaks", &kc1, 0, NULL, 0);
 
 #define NUM_ANALOG_BUTTONS 7
 #define NUM_KEY_CHIPS 5
 #define NUM_LED_CHIPS 2
-#define NUM_LIGHT_BUTTONS 6
+#define NUM_LIGHT_BUTTONS 8
 
 AnalogInput *analog_inputs[NUM_ANALOG_BUTTONS] = {
 		&ai1, &ai2, &ai3, &ai4, &ai5, &ai6, &ai7
@@ -79,7 +80,7 @@ PCF8574 *led_chips[NUM_LED_CHIPS] = {
 		&lc1, &lc2
 };
 LightButton *buttons[NUM_LIGHT_BUTTONS] = {
-		&lb1, &lb2, &lb3, &lb4, &lb5, &lb6
+		&lb1, &lb2, &lb3, &lb4, &lb5, &lb6, &lb7, &lb8
 };
 
 // some button indizes for easier handling
@@ -87,9 +88,8 @@ LightButton *buttons[NUM_LIGHT_BUTTONS] = {
 #define RCS_BUTTON 1
 #define SAS_BUTTON 2
 #define GEAR_BUTTON 3
-#define LIGHT_BUTTON 4
-#define EVA_PACK_BUTTON 5
-#define REACTION_WHEELS_BUTTON 6
+#define LIGHT_BUTTON 6
+#define BREAKS_BUTTON 7
 
 bool interrupt_seen = false;
 
@@ -327,10 +327,9 @@ void check_for_command() {
 		} else {
 			check_button_enabled(rj, "rcs", RCS_BUTTON);
 			check_button_enabled(rj, "sas", SAS_BUTTON);
-//			check_button_enabled(rj, "gear", GEAR_BUTTON);
-//			check_button_enabled(rj, "light", LIGHT_BUTTON);
-//			check_button_enabled(rj, "eva_backpack", EVA_PACK_BUTTON);
-//			check_button_enab+led(rj, "reaction_wheels", REACTION_WHEELS_BUTTON);
+			check_button_enabled(rj, "gear", GEAR_BUTTON);
+			check_button_enabled(rj, "light", LIGHT_BUTTON);
+			check_button_enabled(rj, "breaks", BREAKS_BUTTON);
 
 			if (rj.containsKey("speed")) {
 				print_led(&led_top, (long) rj["speed"]);

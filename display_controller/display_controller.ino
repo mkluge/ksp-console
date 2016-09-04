@@ -127,7 +127,8 @@ void work_on_command(JsonObject& rj) {
 		{
 			if (rj["start"] == 2016) {
 				have_handshake = true;
-				print_lcd( lcd_left, 2, "Handshake");
+				print_lcd( lcd_left, 0, "Surf. Height");
+				print_lcd( lcd_left, 2, "Surf. Time");
 				print_lcd( lcd_right, 0, "Apoapsis");
 				print_lcd( lcd_right, 2, "time to AP");
 				print_lcd( lcd_right, 4, "Periapsis");
@@ -141,6 +142,8 @@ void work_on_command(JsonObject& rj) {
 			CHECK_DATA( "ap_t", lcd_right, 3);
 			CHECK_DATA( "pe", lcd_right, 5);
 			CHECK_DATA( "pe_t", lcd_right, 7);
+			CHECK_DATA( "surf_h", lcd_left, 1);
+			CHECK_DATA( "surf_t", lcd_left, 3);
 		}
 	}
 }
@@ -159,7 +162,7 @@ void loop() {
 			StaticJsonBuffer <READ_BUFFER_SIZE> sjb;
 			JsonObject& rj = sjb.parseObject(mybuf);
 			completed_commands++;
-			print_lcd( lcd_left, 5, completed_commands);
+//			print_lcd( lcd_left, 5, completed_commands);
 			work_on_command(rj);
 			command_complete = false;
 		}

@@ -66,6 +66,9 @@ def send_flight_data():
 			send_data["speed"] = int(vessel.flight(vessel.orbit.body.reference_frame).speed)
 			send_data["sas"] = int(control.sas)
 			send_data["rcs"] = int(control.rcs)
+			send_data["lights"] = int(control.lights)
+			send_data["gear"] = int(control.gear)
+			send_data["breaks"] = int(control.breaks)
 			send_serial(send_data)
 			status_updates={}
 		except krpc.error.RPCError:
@@ -83,6 +86,22 @@ def time_to_string(secs):
 	else:
 		tap = str(int(secs)) + " sec"
 	return tap
+
+def add_landing_info():
+	global args
+	global status_updates
+	global conn
+	if not args.noksp:
+		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+			return
+		try:
+			fligth = conn.space_center.active_vessel.flight()
+			status_updates["surf_h"] = int(flight.surface_altitude)
+			status_updates["surf_t"] = time_to_string(int(flight.surface_altitude/flight.vertical_speed))
+		except krpc.error.RPCError:
+		 	pass
+		except ValueError:
+		  	pass
 
 def add_orbit_to_status():
 	global args
@@ -159,6 +178,21 @@ def work_on_json(input_data):
 				if bool(data["rcs"]):
 					control.rcs = not control.rcs
 				status_updates["rcs"] = int(control.rcs)
+		if "gear" in data:
+			if not args.noksp:
+				if bool(data["gear"]):
+					control.gear = not control.gear
+				status_updates["gear"] = int(control.gear)
+		if "lights" in data:
+			if not args.noksp:
+				if bool(data["lights"]):
+					control.lights = not control.lights
+				status_updates["lights"] = int(control.lights)
+		if "breaks" in data:
+			if not args.noksp:
+				if bool(data["breaks"]):
+					control.breaks = not control.breaks
+				status_updates["breaks"] = int(control.breaks)
 	except ValueError:
 		print('Decoding JSON failed')
 	except krpc.error.RPCError:
@@ -208,6 +242,7 @@ while True:
 	if (diff_short.seconds>0 or diff_short.microseconds>200000) and ser.out_waiting == 0:
 		if diff_long.seconds>1:
 			add_orbit_to_status()
+			add_landing_info()
 			ref_time_long = datetime.datetime.now()
 		send_flight_data()
 		ref_time_short = datetime.datetime.now()
