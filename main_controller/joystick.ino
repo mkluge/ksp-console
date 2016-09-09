@@ -62,7 +62,7 @@ LightButton lb3("sas", &kc1, 6, &lc2, 0);
 LightButton lb4("gear", &kc1, 7, &lc2, 1);
 LightButton lb5("switch_right", &kc5, 6);
 LightButton lb6("switch_left", &kc5, 7);
-LightButton lb7("lights", &kc2, 7, NULL, 0);
+LightButton lb7("lights", &kc2, 0, NULL, 0);
 LightButton lb8("brakes", &kc1, 0, NULL, 0);
 
 #define NUM_ANALOG_BUTTONS 7
