@@ -8,7 +8,7 @@
 Ucglib_ST7735_18x128x160_SWSPI lcd_right( 1, 2, 3, 0, 4);
 Ucglib_ST7735_18x128x160_SWSPI lcd_left( 9, 10, 11, 8, 12);
 
-#define READ_BUFFER_SIZE 200
+#define READ_BUFFER_SIZE 300
 char read_buffer[READ_BUFFER_SIZE];
 volatile int read_buffer_offset = 0;
 int empty_buffer_size = 0;
@@ -162,7 +162,6 @@ void loop() {
 			StaticJsonBuffer <READ_BUFFER_SIZE> sjb;
 			JsonObject& rj = sjb.parseObject(mybuf);
 			completed_commands++;
-//			print_lcd( lcd_left, 5, completed_commands);
 			work_on_command(rj);
 			command_complete = false;
 		}

@@ -63,7 +63,7 @@ LightButton lb4("gear", &kc1, 7, &lc2, 1);
 LightButton lb5("switch_right", &kc5, 6);
 LightButton lb6("switch_left", &kc5, 7);
 LightButton lb7("lights", &kc2, 7, NULL, 0);
-LightButton lb8("breaks", &kc1, 0, NULL, 0);
+LightButton lb8("brakes", &kc1, 0, NULL, 0);
 
 #define NUM_ANALOG_BUTTONS 7
 #define NUM_KEY_CHIPS 5
@@ -89,7 +89,7 @@ LightButton *buttons[NUM_LIGHT_BUTTONS] = {
 #define SAS_BUTTON 2
 #define GEAR_BUTTON 3
 #define LIGHT_BUTTON 6
-#define BREAKS_BUTTON 7
+#define BRAKES_BUTTON 7
 
 bool interrupt_seen = false;
 
@@ -289,9 +289,9 @@ void dieError(int code) {
 
 void sendToSlave(JsonObject &message) {
 	int len=message.measureLength();
-	char buf[400];
-	memset(buf, 0, 400);
-	message.printTo(buf, 400);
+	char buf[READ_BUFFER_SIZE];
+	memset(buf, 0, READ_BUFFER_SIZE);
+	message.printTo(buf, READ_BUFFER_SIZE);
 	buf[len] = '\n';
 	len++;
 	char *ptr=buf;
@@ -329,7 +329,7 @@ void check_for_command() {
 			check_button_enabled(rj, "sas", SAS_BUTTON);
 			check_button_enabled(rj, "gear", GEAR_BUTTON);
 			check_button_enabled(rj, "light", LIGHT_BUTTON);
-			check_button_enabled(rj, "breaks", BREAKS_BUTTON);
+			check_button_enabled(rj, "brakes", BRAKES_BUTTON);
 
 			if (rj.containsKey("speed")) {
 				print_led(&led_top, (long) rj["speed"]);
