@@ -44,22 +44,22 @@
 		<link>
 			<name>core/core</name>
 			<type>2</type>
-			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.11/cores/arduino</location>
+			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/cores/arduino</location>
 		</link>
 		<link>
 			<name>core/variant</name>
 			<type>2</type>
-			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.11/variants/standard</location>
+			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/variants/standard</location>
 		</link>
 		<link>
 			<name>libraries/SPI</name>
 			<type>2</type>
-			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.11/libraries/SPI</location>
+			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/libraries/SPI</location>
 		</link>
 		<link>
 			<name>libraries/Wire</name>
 			<type>2</type>
-			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.11/libraries/Wire</location>
+			<location>C:/Program Files/eclipseArduino/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/libraries/Wire</location>
 		</link>
 	</linkedResources>
 </projectDescription>
