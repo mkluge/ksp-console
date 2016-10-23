@@ -46,6 +46,7 @@ def send_serial(send_data):
 	global args
 	data=json.dumps(send_data)+"\n"
 	if args.debugsend:
+		print("sending %d bytes " % len(json.dumps(send_data)))
 		print("send: "+json.dumps(send_data))
 		sys.stdout.flush()
 	ser.write(data.encode('iso8859-1'))
@@ -103,7 +104,7 @@ def add_action_group_status():
                 if control.get_action_group(grp):
                     status = status + current_value
                     current_value = current_value * 2
-            status_updates["groups"] = status
+            status_updates["ag_state"] = status
         except krpc.error.RPCError:
             pass
         except ValueError:
@@ -151,15 +152,25 @@ def add_orbit_to_status():
 		except ValueError:
 		  	pass
 
+def check_input( data, key, fun, *fargs):
+	global args
+	if key in data and not args.noksp:
+		fun(*fargs)
+
+def expand_solar_arrays( vessel, value):
+	global args
+	if not args.noksp:
+		for solar in vessel.parts.solar_panels:
+			solar.deployed = value
+
 def check_input_and_feedback(data, key, control):
     global args
     global status_updates
     global conn
-    if key in data:
-        if not args.noksp:
-            if bool(data[key]):
-                setattr( control, key, not getattr( control, key))
-            status_updates[key] = int(getattr( control, key))
+    if key in data and not args.noksp:
+        if bool(data[key]):
+            setattr( control, key, not getattr( control, key))
+        status_updates[key] = int(getattr( control, key))
 
 def check_analog( data, key, control, ckey):
     if key in data:
@@ -168,39 +179,51 @@ def check_analog( data, key, control, ckey):
             setattr( control, ckey, normiere_joystick(value))
 
 def work_on_json(input_data):
-    global args
-    global status_updates
-    global conn
+	global args
+	global status_updates
+	global conn
 
-    if not args.noksp:
-        if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
-            return
-    try:
-        if not args.noksp:
-            control = conn.space_center.active_vessel.control
-            data = json.loads(input_data)
-            check_analog( data, "xtrans", control, "right")
-            check_analog( data, "ytrans", control, "up")
-            check_analog( data, "ztrans", control, "forward")
-            check_analog( data, "yaw", control, "yaw")
-            check_analog( data, "pitch", control, "pitch")
-            check_analog( data, "roll", control, "roll")
-        if "thrust" in data:
-            value = data["thrust"]
-            if not args.noksp:
-                control.throttle = normiere_throttle(value)
-        if "stage" in data and data["stage"]==1:
-            if not args.noksp:
-                control.activate_next_stage()
-        check_input_and_feedback( data, "sas", control)
-        check_input_and_feedback( data, "rcs", control)
-        check_input_and_feedback( data, "gear", control)
-        check_input_and_feedback( data, "lights", control)
-        check_input_and_feedback( data, "brakes", control)
-    except ValueError:
-        print('Decoding JSON failed')
-    except krpc.error.RPCError:
-        pass
+	if not args.noksp:
+		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+			return
+	try:
+		if args.noksp:
+			return
+		vessel = conn.space_center.active_vessel
+		control = vessel.control
+		data = json.loads(input_data)
+		check_analog( data, "xtrans", control, "right")
+		check_analog( data, "ytrans", control, "up")
+		check_analog( data, "ztrans", control, "forward")
+		check_analog( data, "yaw", control, "yaw")
+		check_analog( data, "pitch", control, "pitch")
+		check_analog( data, "roll", control, "roll")
+		if "thrust" in data:
+			value = data["thrust"]
+			control.throttle = normiere_throttle(value)
+		if "stage" in data and data["stage"]==1:
+			control.activate_next_stage()
+		check_input_and_feedback( data, "sas", control)
+		check_input_and_feedback( data, "rcs", control)
+		check_input_and_feedback( data, "gear", control)
+		check_input_and_feedback( data, "lights", control)
+		check_input_and_feedback( data, "brakes", control)
+		check_input( data, "ag1", lambda: control.toggle_action_group(0))
+		check_input( data, "ag2", lambda: control.toggle_action_group(1))
+		check_input( data, "ag3", lambda: control.toggle_action_group(2))
+		check_input( data, "ag4", lambda: control.toggle_action_group(3))
+		check_input( data, "ag5", lambda: control.toggle_action_group(4))
+		check_input( data, "ag6", lambda: control.toggle_action_group(5))
+		check_input( data, "ag7", lambda: control.toggle_action_group(6))
+		check_input( data, "ag8", lambda: control.toggle_action_group(7))
+		check_input( data, "ag9", lambda: control.toggle_action_group(8))
+		check_input( data, "ag10", lambda: control.toggle_action_group(9))
+		check_input( data, "solar0", lambda: expand_solar_arrays( vessel, False))
+		check_input( data, "solar1", lambda: expand_solar_arrays( vessel, True))
+	except ValueError:
+		print('Decoding JSON failed')
+	except krpc.error.RPCError:
+		pass
 
 ## main
 
@@ -222,35 +245,32 @@ ref_time_short = datetime.datetime.now()
 ref_time_long = datetime.datetime.now()
 send_handshake()
 while True:
-    check_serial()
-    lines=serial_data.split("\n",1)
-    if len(lines)==2: # means we have a full line
-        if args.debugrecv:
-            print( lines[0] )
-            sys.stdout.flush()
-        serial_data = lines[1]
-        if args.debugchip:
-            try:
-                data = json.loads(lines[0])
-                if "chip" in data:
-                    if data["chip"]!=last_chip_data:
-                        print("Chip: "+str(data["chip"]))
-                        last_chip_data = data["chip"]
-                        sys.stdout.flush()
-            except ValueError:
-                print('Decoding JSON failed for: '+lines[0])
-        work_on_json(lines[0])
-    now = datetime.datetime.now()
-    diff_short = now - ref_time_short
-    diff_long  = now - ref_time_long
-    if (diff_short.seconds>1 or diff_short.microseconds>200000) and ser.out_waiting == 0:
-        if not args.noksp:
-            if conn.krpc.current_game_scene==conn.krpc.GameScene.flight and conn.krpc.current_game_scene!=last_scene:
-                add_action_group_status()
-            if diff_long.seconds>1:
-                add_orbit_to_status()
-                add_landing_info()
-                ref_time_long = datetime.datetime.now()
-            send_flight_data()
-        ref_time_short = datetime.datetime.now()
-        last_scene = conn.krpc.current_game_scene
+	check_serial()
+	lines=serial_data.split("\n",1)
+	if len(lines)==2: # means we have a full line
+		if args.debugrecv:
+			print( lines[0] )
+			sys.stdout.flush()
+		serial_data = lines[1]
+		if args.debugchip:
+			try:
+				data = json.loads(lines[0])
+				if "chip" in data and data["chip"]!=last_chip_data:
+					print("Chip: "+str(data["chip"]))
+					last_chip_data = data["chip"]
+					sys.stdout.flush()
+			except ValueError:
+				print('Decoding JSON failed for: '+lines[0])
+			work_on_json(lines[0])
+	now = datetime.datetime.now()
+	diff_short = now - ref_time_short
+	diff_long  = now - ref_time_long
+	if (diff_short.seconds>1 or diff_short.microseconds>200000) and ser.out_waiting == 0:
+		if not args.noksp:
+			if conn.krpc.current_game_scene==conn.krpc.GameScene.flight and diff_long.seconds>1:
+				add_action_group_status()
+				add_orbit_to_status()
+				add_landing_info()
+				ref_time_long = datetime.datetime.now()
+				send_flight_data()
+			ref_time_short = datetime.datetime.now()
