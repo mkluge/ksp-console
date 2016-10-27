@@ -49,20 +49,20 @@ def send_serial(send_data):
 		print("sending %d bytes " % len(json.dumps(send_data)))
 		print("send: "+data)
 		sys.stdout.flush()
-	data = data.encode('iso8859-1')
+		data = data.encode('iso8859-1')
 		#got to send in 32 byte chunks to avoid loosing stuff
+		ser.write(str(len(data))+":")
 	while( len(data)>0 ):
-		send_pkt = data[:64]
-		data = data[64:]
+		send_pkt = data[:32]
+		data = data[32:]
 		print("write: "+str(send_pkt))
 		ser.write(send_pkt)
 		ser.flush()
-		todo: wait forack pkt
-		data = ""
-		while( len(data)<2 )
-			data = data + ser.read(9999)
-		if len(data) > 0:
-    		serial_data += data.decode('iso8859-1')
+		response = ""
+		while( len(response)<2 )
+			response = response + ser.read(1)
+		if response != "OK":
+			print( "got the wrong ACK for the serial protocol: " +response )
 
 def send_flight_data():
 	global args
