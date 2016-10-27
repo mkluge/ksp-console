@@ -47,9 +47,22 @@ def send_serial(send_data):
 	data=json.dumps(send_data)+"\n"
 	if args.debugsend:
 		print("sending %d bytes " % len(json.dumps(send_data)))
-		print("send: "+json.dumps(send_data))
+		print("send: "+data)
 		sys.stdout.flush()
-	ser.write(data.encode('iso8859-1'))
+	data = data.encode('iso8859-1')
+		#got to send in 32 byte chunks to avoid loosing stuff
+	while( len(data)>0 ):
+		send_pkt = data[:64]
+		data = data[64:]
+		print("write: "+str(send_pkt))
+		ser.write(send_pkt)
+		ser.flush()
+		todo: wait forack pkt
+		data = ""
+		while( len(data)<2 )
+			data = data + ser.read(9999)
+		if len(data) > 0:
+    		serial_data += data.decode('iso8859-1')
 
 def send_flight_data():
 	global args
@@ -237,10 +250,10 @@ args = parser.parse_args()
 if args.noksp:
 	print("noksp: will not connect to KSP")
 
-ser = serial.Serial(port, 38400, timeout=0)
+ser = serial.Serial(port, 115200, timeout=10)
 if not args.noksp:
 	conn = krpc.connect(name='mk console')
-sleep(3)
+sleep(5)
 ref_time_short = datetime.datetime.now()
 ref_time_long = datetime.datetime.now()
 send_handshake()
