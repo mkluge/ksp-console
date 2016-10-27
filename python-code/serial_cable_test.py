@@ -51,7 +51,8 @@ def send_serial(send_data):
 		sys.stdout.flush()
 		data = data.encode('iso8859-1')
 		#got to send in 32 byte chunks to avoid loosing stuff
-		ser.write(str(len(data))+":")
+		len_data = str(len(data))+":"
+		ser.write(len_data.encode('iso8859-1'))
 	while( len(data)>0 ):
 		send_pkt = data[:32]
 		data = data[32:]
@@ -59,8 +60,12 @@ def send_serial(send_data):
 		ser.write(send_pkt)
 		ser.flush()
 		response = ""
-		while( len(response)<2 )
-			response = response + ser.read(1)
+		while( len(response)==2 ):
+			print (len(response))
+			sys.stdout.flush()
+			response += data.decode('iso8859-1')
+		print( "response: " + response)
+		sys.stdout.flush()
 		if response != "OK":
 			print( "got the wrong ACK for the serial protocol: " +response )
 
