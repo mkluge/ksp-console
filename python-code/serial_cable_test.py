@@ -10,15 +10,19 @@ import json
 import argparse
 
 port = "COM4"
-serial_data=""
 last_scene=""
 status_updates = {}
 
-def check_serial():
-	global serial_data
-	data = ser.read(9999)
-	if len(data) > 0:
-    		serial_data += data.decode('iso8859-1')
+def serial_read_line():
+	global ser
+	serial_data = ""
+	while True:
+		data = ser.read(1)
+		if len(data) > 0:
+			data = data.decode('iso8859-1')
+			if data=='\n':
+				return serial_data
+			serial_data += data
 
 # auf -1 ... 1 normieren
 def normiere_joystick(value):
@@ -40,10 +44,12 @@ def normiere_throttle(value):
 def send_handshake():
 	send_data = {}
 	send_data["start"] = 2016
-	send_serial(send_data)
+	send_serial( 3, send_data)
 
-def send_serial(send_data):
+def send_serial( command, send_data):
 	global args
+	global ser
+	send_data["cmd"]=command;
 	data=json.dumps(send_data)+"\n"
 	if args.debugsend:
 		print("sending %d bytes " % len(json.dumps(send_data)))
@@ -60,10 +66,8 @@ def send_serial(send_data):
 		ser.write(send_pkt)
 		ser.flush()
 		response = ""
-		while( len(response)==2 ):
-			print (len(response))
-			sys.stdout.flush()
-			response += data.decode('iso8859-1')
+		while( len(response)!=2 ):
+			response += ser.read(1).decode('iso8859-1')
 		print( "response: " + response)
 		sys.stdout.flush()
 		if response != "OK":
@@ -88,7 +92,7 @@ def send_flight_data():
 			send_data["lights"] = int(control.lights)
 			send_data["gear"] = int(control.gear)
 			send_data["brakes"] = int(control.brakes)
-			send_serial(send_data)
+			send_serial( 2, send_data)
 			status_updates={}
 		except krpc.error.RPCError:
 		 	pass
@@ -255,34 +259,25 @@ args = parser.parse_args()
 if args.noksp:
 	print("noksp: will not connect to KSP")
 
-ser = serial.Serial(port, 115200, timeout=10)
+# no async receives, so it is ok to set a timeout, should
+# make less loops
+ser = serial.Serial(port, 115200, timeout=0)
+ser.reset_input_buffer()
+ser.reset_output_buffer()
 if not args.noksp:
 	conn = krpc.connect(name='mk console')
 sleep(5)
 ref_time_short = datetime.datetime.now()
 ref_time_long = datetime.datetime.now()
 send_handshake()
+now = datetime.datetime.now()
+diff_short = now - ref_time_short
+diff_long  = now - ref_time_long
 while True:
-	check_serial()
-	lines=serial_data.split("\n",1)
-	if len(lines)==2: # means we have a full line
-		if args.debugrecv:
-			print( lines[0] )
-			sys.stdout.flush()
-		serial_data = lines[1]
-		if args.debugchip:
-			try:
-				data = json.loads(lines[0])
-				if "chip" in data and data["chip"]!=last_chip_data:
-					print("Chip: "+str(data["chip"]))
-					last_chip_data = data["chip"]
-					sys.stdout.flush()
-			except ValueError:
-				print('Decoding JSON failed for: '+lines[0])
-			work_on_json(lines[0])
-	now = datetime.datetime.now()
-	diff_short = now - ref_time_short
-	diff_long  = now - ref_time_long
+	# this works command driven, so we send commands,
+	# wait for the reply and done
+
+	# every 2 seconds or so: send update to the arduino
 	if (diff_short.seconds>1 or diff_short.microseconds>200000) and ser.out_waiting == 0:
 		if not args.noksp:
 			if conn.krpc.current_game_scene==conn.krpc.GameScene.flight and diff_long.seconds>1:
@@ -292,3 +287,24 @@ while True:
 				ref_time_long = datetime.datetime.now()
 				send_flight_data()
 			ref_time_short = datetime.datetime.now()
+
+	# read the current status and button updates and so on
+	get_data = {} # just a dummy
+	send_serial( 1, get_data)
+	serial_data=serial_read_line()
+	if args.debugrecv:
+		print( serial_data )
+		sys.stdout.flush()
+	if args.debugchip:
+		try:
+			data = json.loads(serial_data)
+			if "chip" in data and data["chip"]!=last_chip_data:
+				print("Chip: "+str(data["chip"]))
+				last_chip_data = data["chip"]
+				sys.stdout.flush()
+		except ValueError:
+			print('Decoding JSON failed for: '+lines[0])
+	work_on_json(serial_data)
+	now = datetime.datetime.now()
+	diff_short = now - ref_time_short
+	diff_long  = now - ref_time_long
