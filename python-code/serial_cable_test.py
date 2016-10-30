@@ -50,26 +50,25 @@ def send_serial( command, send_data):
 	global args
 	global ser
 	send_data["cmd"]=command;
-	data=json.dumps(send_data)+"\n"
+	data=json.dumps(send_data,separators=(',',':'))+"\n"
 	if args.debugsend:
-		print("sending %d bytes " % len(json.dumps(send_data)))
+		print("sending %d bytes " % len(data))
 		print("send: "+data)
 		sys.stdout.flush()
-		data = data.encode('iso8859-1')
-		#got to send in 32 byte chunks to avoid loosing stuff
-		len_data = str(len(data))+":"
-		ser.write(len_data.encode('iso8859-1'))
+	data = data.encode('iso8859-1')
+	#got to send in 32 byte chunks to avoid loosing stuff
+	len_data = str(len(data))+":"
+	ser.write(len_data.encode('iso8859-1'))
 	while( len(data)>0 ):
 		send_pkt = data[:32]
 		data = data[32:]
-		print("write: "+str(send_pkt))
 		ser.write(send_pkt)
 		ser.flush()
 		response = ""
 		while( len(response)!=2 ):
 			response += ser.read(1).decode('iso8859-1')
-		print( "response: " + response)
-		sys.stdout.flush()
+#		print( "response: " + response)
+#		sys.stdout.flush()
 		if response != "OK":
 			print( "got the wrong ACK for the serial protocol: " +response )
 
