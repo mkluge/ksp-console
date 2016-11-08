@@ -45,7 +45,7 @@ def normiere_throttle(value):
 def send_handshake():
 	send_data = {}
 	send_data["start"] = 2016
-	send_serial( 3, send_data)
+	send_serial( CMD_INIT, send_data)
 
 def send_serial( command, send_data):
 	global args
@@ -106,7 +106,7 @@ def send_flight_data():
 			send_data[BUTTON_LIGHTS] = int(control.lights)
 			send_data[BUTTON_GEAR] = int(control.gear)
 			send_data[BUTTON_BREAKS] = int(control.brakes)
-			send_serial( 2, send_data)
+			send_serial( CMD_UPDATE_CONSOLE, {"data":send_data})
 			status_updates={}
 		except krpc.error.RPCError:
 		 	pass
@@ -304,8 +304,7 @@ while True:
 			ref_time_short = datetime.datetime.now()
 
 	# read the current status and button updates and so on
-	get_data = {} # just a dummy
-	send_serial( 1, get_data)
+	send_serial( CMD_GET_UPDATES, {})
 	serial_data=serial_read_line()
 	if args.debugrecv:
 		print( serial_data )
