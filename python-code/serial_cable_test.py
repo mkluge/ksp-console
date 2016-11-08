@@ -8,6 +8,7 @@ from time import sleep
 import sys
 import json
 import argparse
+from ksp_console import *
 
 port = "COM4"
 last_scene=""
@@ -72,6 +73,20 @@ def send_serial( command, send_data):
 		if response != "OK":
 			print( "got the wrong ACK for the serial protocol: " +response )
 
+def decode_json_array(arr):
+	res={}
+	for index in range( 0, len(arr)/2, 2):
+		res[arr[index]]=arr[index+1]
+	return res
+
+def encode_json_array(arr):
+	global status_updates
+	res=[]
+	for element in status_updates:
+		res.append(element)
+		res.append(status_updates[element])
+	return res
+
 def send_flight_data():
 	global args
 	global status_updates
@@ -84,13 +99,13 @@ def send_flight_data():
 			control = vessel.control
 			orbit = vessel.orbit
 			send_data = status_updates
-			send_data["height"] = int(vessel.flight().surface_altitude)
-			send_data["speed"] = int(vessel.flight(vessel.orbit.body.reference_frame).speed)
-			send_data["sas"] = int(control.sas)
-			send_data["rcs"] = int(control.rcs)
-			send_data["lights"] = int(control.lights)
-			send_data["gear"] = int(control.gear)
-			send_data["brakes"] = int(control.brakes)
+			send_data[INFO_HEIGHT] = int(vessel.flight().surface_altitude)
+			send_data[INFO_SPEED] = int(vessel.flight(vessel.orbit.body.reference_frame).speed)
+			send_data[BUTTON_SAS] = int(control.sas)
+			send_data[BUTTON_RCS] = int(control.rcs)
+			send_data[BUTTON_LIGHTS] = int(control.lights)
+			send_data[BUTTON_GEAR] = int(control.gear)
+			send_data[BUTTON_BREAKS] = int(control.brakes)
 			send_serial( 2, send_data)
 			status_updates={}
 		except krpc.error.RPCError:
@@ -125,7 +140,7 @@ def add_action_group_status():
                 if control.get_action_group(grp):
                     status = status + current_value
                     current_value = current_value * 2
-            status_updates["ag_state"] = status
+            status_updates[INFO_ACTION_GROUPS] = status
         except krpc.error.RPCError:
             pass
         except ValueError:
@@ -140,12 +155,12 @@ def add_landing_info():
             return
         try:
             flight = conn.space_center.active_vessel.flight()
-            status_updates["surf_h"] = int(flight.surface_altitude)
+            status_updates[INFO_SURFACE_HEIGHT] = int(flight.surface_altitude)
             speed = int( conn.space_center.active_vessel.flight( conn.space_center.active_vessel.orbit.body.reference_frame).vertical_speed)
             if( speed<0.0 ):
-                status_updates["surf_t"] = time_to_string(int(flight.surface_altitude/abs(speed)))
+                status_updates[INFO_SURFACE_TIME] = time_to_string(int(flight.surface_altitude/abs(speed)))
             else:
-                status_updates["surf_t"] = "n/a"
+                status_updates[INFO_SURFACE_TIME] = "n/a"
         except krpc.error.RPCError:
             pass
         except ValueError:
@@ -160,14 +175,14 @@ def add_orbit_to_status():
 			return
 		try:
 			orbit = conn.space_center.active_vessel.orbit
-			status_updates["ap"] = int(orbit.apoapsis_altitude)
-			status_updates["ap_t"] = time_to_string(int(orbit.time_to_apoapsis))
+			status_updates[INFO_APOAPSIS] = int(orbit.apoapsis_altitude)
+			status_updates[INFO_APOAPSIS_TIME] = time_to_string(int(orbit.time_to_apoapsis))
 			if orbit.periapsis_altitude>0:
-				status_updates["pe"] = int(orbit.periapsis_altitude)
-				status_updates["pe_t"] = time_to_string(int(orbit.time_to_periapsis))
+				status_updates[INFO_PERIAPSIS] = int(orbit.periapsis_altitude)
+				status_updates[INFO_PERIAPSIS_TIME] = time_to_string(int(orbit.time_to_periapsis))
 			else:
-				status_updates["pe"] = "n/a"
-				status_updates["pe_t"] = "n/a"
+				status_updates[INFO_PERIAPSIS] = "n/a"
+				status_updates[INFO_PERIAPSIS_TIME] = "n/a"
 		except krpc.error.RPCError:
 		 	pass
 		except ValueError:
@@ -212,35 +227,36 @@ def work_on_json(input_data):
 			return
 		vessel = conn.space_center.active_vessel
 		control = vessel.control
-		data = json.loads(input_data)
-		check_analog( data, "xtrans", control, "right")
-		check_analog( data, "ytrans", control, "up")
-		check_analog( data, "ztrans", control, "forward")
-		check_analog( data, "yaw", control, "yaw")
-		check_analog( data, "pitch", control, "pitch")
-		check_analog( data, "roll", control, "roll")
-		if "thrust" in data:
-			value = data["thrust"]
+		json_data = json.loads(input_data)
+		data = decode_json_array(json_data["data"])
+		check_analog( data, KSP_INPUT_XTRANS, control, "right")
+		check_analog( data, KSP_INPUT_YTRANS, control, "up")
+		check_analog( data, KSP_INPUT_ZTRANS, control, "forward")
+		check_analog( data, KSP_INPUT_YAW, control, "yaw")
+		check_analog( data, KSP_INPUT_PITCH, control, "pitch")
+		check_analog( data, KSP_INPUT_ROLL, control, "roll")
+		if KSP_INPUT_THRUST in data:
+			value = data[KSP_INPUT_THRUST]
 			control.throttle = normiere_throttle(value)
-		if "stage" in data and data["stage"]==1:
+		if BUTTON_STAGE in data and data[BUTTON_STAGE]==1:
 			control.activate_next_stage()
-		check_input_and_feedback( data, "sas", control)
-		check_input_and_feedback( data, "rcs", control)
-		check_input_and_feedback( data, "gear", control)
-		check_input_and_feedback( data, "lights", control)
-		check_input_and_feedback( data, "brakes", control)
-		check_input( data, "ag1", lambda: control.toggle_action_group(0))
-		check_input( data, "ag2", lambda: control.toggle_action_group(1))
-		check_input( data, "ag3", lambda: control.toggle_action_group(2))
-		check_input( data, "ag4", lambda: control.toggle_action_group(3))
-		check_input( data, "ag5", lambda: control.toggle_action_group(4))
-		check_input( data, "ag6", lambda: control.toggle_action_group(5))
-		check_input( data, "ag7", lambda: control.toggle_action_group(6))
-		check_input( data, "ag8", lambda: control.toggle_action_group(7))
-		check_input( data, "ag9", lambda: control.toggle_action_group(8))
-		check_input( data, "ag10", lambda: control.toggle_action_group(9))
-		check_input( data, "solar0", lambda: expand_solar_arrays( vessel, False))
-		check_input( data, "solar1", lambda: expand_solar_arrays( vessel, True))
+		check_input_and_feedback( data, BUTTON_SAS, control)
+		check_input_and_feedback( data, BUTTON_RCS, control)
+		check_input_and_feedback( data, BUTTON_GEAR, control)
+		check_input_and_feedback( data, BUTTON_LIGHTS, control)
+		check_input_and_feedback( data, BUTTON_BREAKS, control)
+		check_input( data, BUTTON_ACTION_1, lambda: control.toggle_action_group(0))
+		check_input( data, BUTTON_ACTION_2, lambda: control.toggle_action_group(1))
+		check_input( data, BUTTON_ACTION_3, lambda: control.toggle_action_group(2))
+		check_input( data, BUTTON_ACTION_4, lambda: control.toggle_action_group(3))
+		check_input( data, BUTTON_ACTION_5, lambda: control.toggle_action_group(4))
+		check_input( data, BUTTON_ACTION_6, lambda: control.toggle_action_group(5))
+		check_input( data, BUTTON_ACTION_7, lambda: control.toggle_action_group(6))
+		check_input( data, BUTTON_ACTION_8, lambda: control.toggle_action_group(7))
+		check_input( data, BUTTON_ACTION_9, lambda: control.toggle_action_group(8))
+		check_input( data, BUTTON_ACTION_10, lambda: control.toggle_action_group(9))
+		check_input( data, BUTTON_SOLAR_OFF, lambda: expand_solar_arrays( vessel, False))
+		check_input( data, BUTTON_SOLAR_ON, lambda: expand_solar_arrays( vessel, True))
 	except ValueError:
 		print('Decoding JSON failed')
 	except krpc.error.RPCError:
@@ -265,7 +281,7 @@ ser.reset_input_buffer()
 ser.reset_output_buffer()
 if not args.noksp:
 	conn = krpc.connect(name='mk console')
-sleep(5)
+sleep(3)
 ref_time_short = datetime.datetime.now()
 ref_time_long = datetime.datetime.now()
 send_handshake()
