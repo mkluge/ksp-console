@@ -81,11 +81,10 @@ def decode_json_array(arr):
 	return res
 
 def encode_json_array(arr):
-	global status_updates
 	res=[]
-	for element in status_updates:
+	for element in arr:
 		res.append(element)
-		res.append(status_updates[element])
+		res.append(arr[element])
 	return res
 
 def send_flight_data():
@@ -99,14 +98,14 @@ def send_flight_data():
 			vessel = conn.space_center.active_vessel
 			control = vessel.control
 			orbit = vessel.orbit
-			send_data = status_updates
-			send_data[INFO_HEIGHT] = int(vessel.flight().surface_altitude)
-			send_data[INFO_SPEED] = int(vessel.flight(vessel.orbit.body.reference_frame).speed)
-			send_data[BUTTON_SAS] = int(control.sas)
-			send_data[BUTTON_RCS] = int(control.rcs)
-			send_data[BUTTON_LIGHTS] = int(control.lights)
-			send_data[BUTTON_GEAR] = int(control.gear)
-			send_data[BUTTON_BREAKS] = int(control.brakes)
+			status_updates[str(INFO_HEIGHT)] = int(vessel.flight().surface_altitude)
+			status_updates[str(INFO_SPEED)] = int(vessel.flight(vessel.orbit.body.reference_frame).speed)
+			status_updates[str(BUTTON_SAS)] = int(control.sas)
+			status_updates[str(BUTTON_RCS)] = int(control.rcs)
+			status_updates[str(BUTTON_LIGHTS)] = int(control.lights)
+			status_updates[str(BUTTON_GEAR)] = int(control.gear)
+			status_updates[str(BUTTON_BREAKS)] = int(control.brakes)
+			send_data = encode_json_array(status_updates)
 			send_serial( CMD_UPDATE_CONSOLE, {"data":send_data})
 			status_updates={}
 		except krpc.error.RPCError:
@@ -141,7 +140,7 @@ def add_action_group_status():
                 if control.get_action_group(grp):
                     status = status + current_value
                     current_value = current_value * 2
-            status_updates[INFO_ACTION_GROUPS] = status
+            status_updates[str(INFO_ACTION_GROUPS)] = status
         except krpc.error.RPCError:
             pass
         except ValueError:
@@ -156,12 +155,12 @@ def add_landing_info():
             return
         try:
             flight = conn.space_center.active_vessel.flight()
-            status_updates[INFO_SURFACE_HEIGHT] = int(flight.surface_altitude)
+            status_updates[str(INFO_SURFACE_HEIGHT)] = int(flight.surface_altitude)
             speed = int( conn.space_center.active_vessel.flight( conn.space_center.active_vessel.orbit.body.reference_frame).vertical_speed)
             if( speed<0.0 ):
-                status_updates[INFO_SURFACE_TIME] = time_to_string(int(flight.surface_altitude/abs(speed)))
+                status_updates[str(INFO_SURFACE_TIME)] = time_to_string(int(flight.surface_altitude/abs(speed)))
             else:
-                status_updates[INFO_SURFACE_TIME] = "n/a"
+                status_updates[str(INFO_SURFACE_TIME)] = "n/a"
         except krpc.error.RPCError:
             pass
         except ValueError:
@@ -176,14 +175,14 @@ def add_orbit_to_status():
 			return
 		try:
 			orbit = conn.space_center.active_vessel.orbit
-			status_updates[INFO_APOAPSIS] = int(orbit.apoapsis_altitude)
-			status_updates[INFO_APOAPSIS_TIME] = time_to_string(int(orbit.time_to_apoapsis))
+			status_updates[str(INFO_APOAPSIS)] = int(orbit.apoapsis_altitude)
+			status_updates[str(INFO_APOAPSIS_TIME)] = time_to_string(int(orbit.time_to_apoapsis))
 			if orbit.periapsis_altitude>0:
-				status_updates[INFO_PERIAPSIS] = int(orbit.periapsis_altitude)
-				status_updates[INFO_PERIAPSIS_TIME] = time_to_string(int(orbit.time_to_periapsis))
+				status_updates[str(INFO_PERIAPSIS)] = int(orbit.periapsis_altitude)
+				status_updates[str(INFO_PERIAPSIS_TIME)] = time_to_string(int(orbit.time_to_periapsis))
 			else:
-				status_updates[INFO_PERIAPSIS] = "n/a"
-				status_updates[INFO_PERIAPSIS_TIME] = "n/a"
+				status_updates[str(INFO_PERIAPSIS)] = "n/a"
+				status_updates[str(INFO_PERIAPSIS_TIME)] = "n/a"
 		except krpc.error.RPCError:
 		 	pass
 		except ValueError:
@@ -207,7 +206,7 @@ def check_input_and_feedback(data, key_str, key, control):
     if key in data and not args.noksp:
         if bool(data[key]):
             setattr( control, key_str, not getattr( control, key_str))
-        status_updates[key] = int(getattr( control, key_str))
+        status_updates[str(key)] = int(getattr( control, key_str))
 
 def check_analog( data, key, control, ckey):
     if key in data:
