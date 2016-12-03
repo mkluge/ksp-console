@@ -105,6 +105,18 @@ def send_flight_data():
 			status_updates[str(BUTTON_LIGHTS)] = int(control.lights)
 			status_updates[str(BUTTON_GEAR)] = int(control.gear)
 			status_updates[str(BUTTON_BREAKS)] = int(control.brakes)
+			send_updates()
+		except krpc.error.RPCError:
+		 	pass
+
+def send_updates():
+	global args
+	global status_updates
+	global conn
+	if not args.noksp:
+		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+			return
+		try:
 			send_data = encode_json_array(status_updates)
 			send_serial( CMD_UPDATE_CONSOLE, {"data":send_data})
 			status_updates={}
@@ -326,6 +338,9 @@ while True:
 		except ValueError:
 			print('Decoding JSON failed for: '+lines[0])
 	work_on_json(serial_data)
+	# if this generated updates -> send them right away
+	if len(status_updates)>0:
+		send_updates()
 	now = datetime.datetime.now()
 	diff_short = now - ref_time_short
 	diff_long  = now - ref_time_long
