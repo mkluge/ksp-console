@@ -10,7 +10,8 @@ import json
 import argparse
 from ksp_console import *
 
-port = "COM4"
+#port = "COM4"
+port = "/dev/ttyS3"
 last_scene=""
 status_updates = {}
 
@@ -75,7 +76,7 @@ def send_serial( command, send_data):
 
 def decode_json_array(arr):
 	res={}
-	for index in range( 0, len(arr)/2, 2):
+	for index in range( 0, len(arr), 2):
 		res[arr[index]]=arr[index+1]
 	return res
 
@@ -229,12 +230,18 @@ def work_on_json(input_data):
 		control = vessel.control
 		json_data = json.loads(input_data)
 		data = decode_json_array(json_data["data"])
+		if args.debugrecv:
+			print( data )
+			sys.stdout.flush()
 		check_analog( data, KSP_INPUT_XTRANS, control, "right")
 		check_analog( data, KSP_INPUT_YTRANS, control, "up")
 		check_analog( data, KSP_INPUT_ZTRANS, control, "forward")
 		check_analog( data, KSP_INPUT_YAW, control, "yaw")
 		check_analog( data, KSP_INPUT_PITCH, control, "pitch")
 		check_analog( data, KSP_INPUT_ROLL, control, "roll")
+		if args.debugrecv:
+			print( data )
+			sys.stdout.flush()
 		if KSP_INPUT_THRUST in data:
 			value = data[KSP_INPUT_THRUST]
 			control.throttle = normiere_throttle(value)
@@ -293,7 +300,8 @@ while True:
 	# wait for the reply and done
 
 	# every 2 seconds or so: send update to the arduino
-	if (diff_short.seconds>1 or diff_short.microseconds>200000) and ser.out_waiting == 0:
+#	if (diff_short.seconds>1 or diff_short.microseconds>200000) and ser.out_waiting == 0:
+	if (diff_short.seconds>1 or diff_short.microseconds>200000):
 		if not args.noksp:
 			if conn.krpc.current_game_scene==conn.krpc.GameScene.flight and diff_long.seconds>1:
 				add_action_group_status()
