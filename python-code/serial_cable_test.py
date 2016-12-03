@@ -200,14 +200,14 @@ def expand_solar_arrays( vessel, value):
 		for solar in vessel.parts.solar_panels:
 			solar.deployed = value
 
-def check_input_and_feedback(data, key, control):
+def check_input_and_feedback(data, key_str, key, control):
     global args
     global status_updates
     global conn
     if key in data and not args.noksp:
         if bool(data[key]):
-            setattr( control, key, not getattr( control, key))
-        status_updates[key] = int(getattr( control, key))
+            setattr( control, key_str, not getattr( control, key_str))
+        status_updates[key] = int(getattr( control, key_str))
 
 def check_analog( data, key, control, ckey):
     if key in data:
@@ -247,11 +247,11 @@ def work_on_json(input_data):
 			control.throttle = normiere_throttle(value)
 		if BUTTON_STAGE in data and data[BUTTON_STAGE]==1:
 			control.activate_next_stage()
-		check_input_and_feedback( data, BUTTON_SAS, control)
-		check_input_and_feedback( data, BUTTON_RCS, control)
-		check_input_and_feedback( data, BUTTON_GEAR, control)
-		check_input_and_feedback( data, BUTTON_LIGHTS, control)
-		check_input_and_feedback( data, BUTTON_BREAKS, control)
+		check_input_and_feedback( data, "sas", BUTTON_SAS, control)
+		check_input_and_feedback( data, "rcs", BUTTON_RCS, control)
+		check_input_and_feedback( data, "gear", BUTTON_GEAR, control)
+		check_input_and_feedback( data, "lights", BUTTON_LIGHTS, control)
+		check_input_and_feedback( data, "brakes", BUTTON_BREAKS, control)
 		check_input( data, BUTTON_ACTION_1, lambda: control.toggle_action_group(0))
 		check_input( data, BUTTON_ACTION_2, lambda: control.toggle_action_group(1))
 		check_input( data, BUTTON_ACTION_3, lambda: control.toggle_action_group(2))
