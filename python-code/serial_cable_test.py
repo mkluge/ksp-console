@@ -83,7 +83,7 @@ def decode_json_array(arr):
 def encode_json_array(arr):
 	res=[]
 	for element in arr:
-		res.append(element)
+		res.append(int(element))
 		res.append(arr[element])
 	return res
 
