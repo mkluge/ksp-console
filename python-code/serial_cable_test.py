@@ -137,26 +137,30 @@ def time_to_string(secs):
 	return tap
 
 def add_action_group_status():
-    global args
-    global status_updates
-    global conn
-    if not args.noksp:
-        if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
-            return
-        try:
-            vessel = conn.space_center.active_vessel
-            control = vessel.control
-            status=0
-            current_value=1
-            for grp in range(0,9):
-                if control.get_action_group(grp):
-                    status = status + current_value
-                    current_value = current_value * 2
-            status_updates[str(INFO_ACTION_GROUPS)] = status
-        except krpc.error.RPCError:
-            pass
-        except ValueError:
-            pass
+	global args
+	global status_updates
+	global conn
+	if not args.noksp:
+		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+			return
+		try:
+			vessel = conn.space_center.active_vessel
+			control = vessel.control
+			status=0
+			current_value=1
+			for grp in [1,2,3,4,5,6,7,8,9,0]:
+#				print("Status of group " +str(grp) + " is " + str(control.get_action_group(grp)))
+#				sys.stdout.flush()
+				if control.get_action_group(grp):
+					status = status + current_value
+				current_value = current_value * 2
+			status_updates[str(INFO_ACTION_GROUPS)] = status
+#			print("status of all groups is "+str(status))
+#			sys.stdout.flush()
+		except krpc.error.RPCError:
+			pass
+		except ValueError:
+			pass
 
 def add_landing_info():
     global args
@@ -203,7 +207,8 @@ def add_orbit_to_status():
 def check_input( data, key, fun, *fargs):
 	global args
 	if key in data and not args.noksp:
-		fun(*fargs)
+		if data[key]==1:
+			fun(*fargs)
 
 def expand_solar_arrays( vessel, value):
 	global args
@@ -263,16 +268,18 @@ def work_on_json(input_data):
 		check_input_and_feedback( data, "gear", BUTTON_GEAR, control)
 		check_input_and_feedback( data, "lights", BUTTON_LIGHTS, control)
 		check_input_and_feedback( data, "brakes", BUTTON_BREAKS, control)
-		check_input( data, BUTTON_ACTION_1, lambda: control.toggle_action_group(0))
-		check_input( data, BUTTON_ACTION_2, lambda: control.toggle_action_group(1))
-		check_input( data, BUTTON_ACTION_3, lambda: control.toggle_action_group(2))
-		check_input( data, BUTTON_ACTION_4, lambda: control.toggle_action_group(3))
-		check_input( data, BUTTON_ACTION_5, lambda: control.toggle_action_group(4))
-		check_input( data, BUTTON_ACTION_6, lambda: control.toggle_action_group(5))
-		check_input( data, BUTTON_ACTION_7, lambda: control.toggle_action_group(6))
-		check_input( data, BUTTON_ACTION_8, lambda: control.toggle_action_group(7))
-		check_input( data, BUTTON_ACTION_9, lambda: control.toggle_action_group(8))
-		check_input( data, BUTTON_ACTION_10, lambda: control.toggle_action_group(9))
+		# the action buttons seem to be mixed up, in krpc there are called 0-9
+		# ksp calls them 1-10; the mapping is 1-9->1-9 and 10->0
+		check_input( data, BUTTON_ACTION_1, lambda: control.toggle_action_group(1))
+		check_input( data, BUTTON_ACTION_2, lambda: control.toggle_action_group(2))
+		check_input( data, BUTTON_ACTION_3, lambda: control.toggle_action_group(3))
+		check_input( data, BUTTON_ACTION_4, lambda: control.toggle_action_group(4))
+		check_input( data, BUTTON_ACTION_5, lambda: control.toggle_action_group(5))
+		check_input( data, BUTTON_ACTION_6, lambda: control.toggle_action_group(6))
+		check_input( data, BUTTON_ACTION_7, lambda: control.toggle_action_group(7))
+		check_input( data, BUTTON_ACTION_8, lambda: control.toggle_action_group(8))
+		check_input( data, BUTTON_ACTION_9, lambda: control.toggle_action_group(9))
+		check_input( data, BUTTON_ACTION_10, lambda: control.toggle_action_group(0))
 		check_input( data, BUTTON_SOLAR_OFF, lambda: expand_solar_arrays( vessel, False))
 		check_input( data, BUTTON_SOLAR_ON, lambda: expand_solar_arrays( vessel, True))
 	except ValueError:
@@ -300,27 +307,25 @@ ser.reset_output_buffer()
 if not args.noksp:
 	conn = krpc.connect(name='mk console')
 sleep(3)
-ref_time_short = datetime.datetime.now()
-ref_time_long = datetime.datetime.now()
 send_handshake()
-now = datetime.datetime.now()
-diff_short = now - ref_time_short
-diff_long  = now - ref_time_long
+ref_time = datetime.datetime.now()
 while True:
+	now = datetime.datetime.now()
+	time_diff = now - ref_time
 	# this works command driven, so we send commands,
 	# wait for the reply and done
 
 	# every 2 seconds or so: send update to the arduino
 #	if (diff_short.seconds>1 or diff_short.microseconds>200000) and ser.out_waiting == 0:
-	if (diff_short.seconds>1 or diff_short.microseconds>200000):
+	if (time_diff.seconds>2):
 		if not args.noksp:
-			if conn.krpc.current_game_scene==conn.krpc.GameScene.flight and diff_long.seconds>1:
+			if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
 				add_action_group_status()
 				add_orbit_to_status()
 				add_landing_info()
 				ref_time_long = datetime.datetime.now()
 				send_flight_data()
-			ref_time_short = datetime.datetime.now()
+		ref_time = now
 
 	# read the current status and button updates and so on
 	send_serial( CMD_GET_UPDATES, {})
@@ -341,6 +346,3 @@ while True:
 	# if this generated updates -> send them right away
 	if len(status_updates)>0:
 		send_updates()
-	now = datetime.datetime.now()
-	diff_short = now - ref_time_short
-	diff_long  = now - ref_time_long
