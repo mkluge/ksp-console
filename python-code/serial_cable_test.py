@@ -276,6 +276,11 @@ def button_reaction_wheels( vessel ):
 				r.active = True
 
 def camera_button():
+	camera = conn.space_center.camera
+	if camera.mode==CameraMode.map:
+		camera.mode=CameraMode.automatic
+	else:
+		camera.mode=CameraMode.map
 	return
 
 def button_test(vessel):
