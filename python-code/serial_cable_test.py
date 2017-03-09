@@ -3,6 +3,7 @@
 
 import datetime
 import krpc
+import os
 import serial
 from time import sleep
 import sys
@@ -12,7 +13,27 @@ from ksp_console import *
 
 #port = "COM4"
 port = "/dev/ttyS3"
-last_scene=""
+
+class State:
+	last_scene=""
+	# 0 means -> slider
+	# 1 means 100 from button
+	# 2 means 0 from button
+	thrust_state=""
+	last_thrust_from_slider=0
+	sas_mode_list=[
+		SASMode.stability_assist, SASMode.maneuver,
+		SASMode.prograde, SASMode.retrograde,
+		SASMode.normal, SASMode.anti_normal,
+		SASMode.radial, SASMode.anti_radial,
+		SASMode.target, SASMode.anti_target ]
+	current_sas_mode=0
+	num_sas_modess=len(sas_mode_list)
+	speed_mode_list=[ SpeedMode.orbit, SpeedMode.surface, SpeedMode.orbit ]
+	current_speed_mode=0
+	num_speed_modes=len(speed_mode_list)
+
+state = State()
 status_updates = {}
 
 def serial_read_line():
@@ -77,6 +98,7 @@ def send_serial( command, send_data):
 def decode_json_array(arr):
 	res={}
 	for index in range( 0, len(arr), 2):
+#		if int(arr[index])>7:
 		res[arr[index]]=arr[index+1]
 	return res
 
@@ -210,6 +232,85 @@ def check_input( data, key, fun, *fargs):
 		if data[key]==1:
 			fun(*fargs)
 
+def enable_all_engines( vessel, value):
+	global args
+	if not args.noksp:
+		for e in vessel.parts.engines:
+			e.active = value
+
+def chutes_go( vessel ):
+	global args
+	if not args.noksp:
+		for c in vessel.parts.parachutes:
+			c.deploy()
+
+def full_thrust( vessel ):
+	global state
+	control = vessel.control
+	if state.thrust_state==0:
+		state.last_thrust_from_slider = control.throttle
+	control.throttle=1
+	state.thrust_state=1
+
+def zero_thrust( vessel ):
+	global state
+	control = vessel.control
+	if state.thrust_state==0:
+		state.last_thrust_from_slider = control.throttle
+	control.throttle=0
+	state.thrust_state=2
+
+def button_abort( vessel ):
+	return
+
+def button_fuel( vessel ):
+	return
+
+def button_reaction_wheels( vessel ):
+	global args
+	if not args.noksp:
+		for r in vessel.parts.reaction_wheels:
+			if r.active == True:
+				r.active = False
+			else:
+				r.active = True
+
+def camera_button():
+	return
+
+def button_test(vessel):
+	return
+
+def button_eva(vessel):
+	return
+
+def button_iva(vessel):
+	return
+
+def next_sas_mode(vessel):
+	global state
+	# if sas was off, just enable it
+	control = vessel.control
+	if control.sas == False:
+		control.sas = True
+		return
+	next_mode = state.current_sas_mode+1
+	if next_mode==state.num_sas_modes:
+		next_mode=0
+	control.sas_mode=state.sas_mode_list[next_mode]
+	state.current_sas_mode=next_mode
+	return
+
+def next_speed_mode(vessel):
+	global state
+	control = vessel.control
+	next_mode = state.current_speed_mode+1
+	if next_mode==state.num_speed_modes:
+		next_mode=0
+	control.speed_mode=state.speed_mode_list[next_mode]
+	state.current_speed_mode=next_mode
+	return
+
 def expand_solar_arrays( vessel, value):
 	global args
 	if not args.noksp:
@@ -235,20 +336,22 @@ def work_on_json(input_data):
 	global args
 	global status_updates
 	global conn
+	global state
 
 	if not args.noksp:
 		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
 			return
 	try:
+		json_data = json.loads(input_data)
+		data = decode_json_array(json_data["data"])
+		if args.debugrecv:
+			if len(data)>0:
+				print( data )
+				sys.stdout.flush()
 		if args.noksp:
 			return
 		vessel = conn.space_center.active_vessel
 		control = vessel.control
-		json_data = json.loads(input_data)
-		data = decode_json_array(json_data["data"])
-		if args.debugrecv:
-			print( data )
-			sys.stdout.flush()
 		check_analog( data, KSP_INPUT_XTRANS, control, "right")
 		check_analog( data, KSP_INPUT_YTRANS, control, "up")
 		check_analog( data, KSP_INPUT_ZTRANS, control, "forward")
@@ -259,8 +362,14 @@ def work_on_json(input_data):
 			print( data )
 			sys.stdout.flush()
 		if KSP_INPUT_THRUST in data:
-			value = data[KSP_INPUT_THRUST]
-			control.throttle = normiere_throttle(value)
+			value = normiere_throttle(data[KSP_INPUT_THRUST])
+			if state.thrust_state==0:
+				control.throttle = value
+			else
+				# only set if slider has been moved
+				if abs(state.last_thrust_from_slider-value)>0.05:
+					state.thrust_state=0
+					control.throttle=value
 		if BUTTON_STAGE in data and data[BUTTON_STAGE]==1:
 			control.activate_next_stage()
 		check_input_and_feedback( data, "sas", BUTTON_SAS, control)
@@ -282,6 +391,22 @@ def work_on_json(input_data):
 		check_input( data, BUTTON_ACTION_10, lambda: control.toggle_action_group(0))
 		check_input( data, BUTTON_SOLAR_OFF, lambda: expand_solar_arrays( vessel, False))
 		check_input( data, BUTTON_SOLAR_ON, lambda: expand_solar_arrays( vessel, True))
+		check_input( data, BUTTON_ENGINES_ON, lambda: enable_all_engines( vessel, True))
+		check_input( data, BUTTON_ENGINES_OFF, lambda: enable_all_engines( vessel, False))
+		check_input( data, BUTTON_ABORT, lambda: button_abort( vessel, True))
+		check_input( data, BUTTON_FUEL, lambda: button_fuel( vessel, True))
+		check_input( data, BUTTON_REACTION_WHEELS, lambda: button_reaction_wheels( vessel, True))
+		check_input( data, BUTTON_STORE, lambda: conn.space_center.quicksave() )
+		check_input( data, BUTTON_LOAD, lambda: conn.space_center.quickload() )
+		check_input( data, BUTTON_CAMERA, lambda: camera_button() )
+		check_input( data, BUTTON_TEST, lambda: button_test(vessel) )
+		check_input( data, BUTTON_EVA, lambda: button_eva(vessel) )
+		check_input( data, BUTTON_IVA, lambda: button_iva(vessel) )
+		check_input( data, BUTTON_SAS_MODE, lambda: next_sas_mode(vessel) )
+		check_input( data, BUTTON_SPEED_MODE, lambda: next_speed_mode(vessel) )
+		check_input( data, BUTTON_THRUST_FULL, lambda: full_thrust(vessel) )
+		check_input( data, BUTTON_THRUST_ZERO, lambda: zero_thrust(vessel) )
+		check_input( data, BUTTON_CHUTES, lambda: chutes_go(vessel) )
 	except ValueError:
 		print('Decoding JSON failed')
 	except krpc.error.RPCError:
@@ -306,6 +431,7 @@ ser.reset_input_buffer()
 ser.reset_output_buffer()
 if not args.noksp:
 	conn = krpc.connect(name='mk console')
+
 sleep(3)
 send_handshake()
 ref_time = datetime.datetime.now()
@@ -330,9 +456,9 @@ while True:
 	# read the current status and button updates and so on
 	send_serial( CMD_GET_UPDATES, {})
 	serial_data=serial_read_line()
-	if args.debugrecv:
-		print( serial_data )
-		sys.stdout.flush()
+#	if args.debugrecv:
+#		print( decode_json_array(serial_data["data"]) )
+#		sys.stdout.flush()
 	if args.debugchip:
 		try:
 			data = json.loads(serial_data)
