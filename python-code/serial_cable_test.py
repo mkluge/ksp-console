@@ -403,7 +403,7 @@ def work_on_json(input_data):
 		check_input( data, BUTTON_REACTION_WHEELS, lambda: button_reaction_wheels( vessel, True))
 		check_input( data, BUTTON_STORE, lambda: conn.space_center.quicksave() )
 		check_input( data, BUTTON_LOAD, lambda: conn.space_center.quickload() )
-		check_input( data, BUTTON_CAMERA, lambda: camera_button() )
+		check_input( data, BUTTON_CAMERA, lambda: camera_button(vessel) )
 		check_input( data, BUTTON_TEST, lambda: button_test(vessel) )
 		check_input( data, BUTTON_EVA, lambda: button_eva(vessel) )
 		check_input( data, BUTTON_IVA, lambda: button_iva(vessel) )
