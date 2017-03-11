@@ -16,23 +16,23 @@ port = "/dev/ttyS3"
 
 class State:
 	def __init__(self, conn):
-		last_scene=""
+		self.last_scene=""
 		# 0 means -> slider
 		# 1 means 100 from button
 		# 2 means 0 from button
-		thrust_state=""
-		last_thrust_from_slider=0
+		self.thrust_state=0
+		self.last_thrust_from_slider=0
 		s = conn.space_center.SASMode
-		sas_mode_list=[
+		self.sas_mode_list=[
 			s.stability_assist, s.maneuver,
 			s.prograde, s.retrograde, s.normal, s.anti_normal,
 			s.radial, s.anti_radial, s.target, s.anti_target ]
-		current_sas_mode=0
-		num_sas_modess=len(sas_mode_list)
+		self.current_sas_mode=0
+		self.num_sas_modes=len(self.sas_mode_list)
 		s = conn.space_center.SpeedMode
-		speed_mode_list=[ s.orbit, s.surface, s.target ]
-		current_speed_mode=0
-		num_speed_modes=len(speed_mode_list)
+		self.current_speed_mode=0
+		self.speed_mode_list=[ s.orbit, s.surface, s.target ]
+		self.num_speed_modes=len(self.speed_mode_list)
 
 status_updates = {}
 
@@ -277,10 +277,10 @@ def button_reaction_wheels( vessel ):
 
 def camera_button():
 	camera = conn.space_center.camera
-	if camera.mode==CameraMode.map:
-		camera.mode=CameraMode.automatic
+	if camera.mode==conn.space_center.CameraMode.map:
+		camera.mode=conn.space_center.CameraMode.automatic
 	else:
-		camera.mode=CameraMode.map
+		camera.mode=conn.space_center.CameraMode.map
 	return
 
 def button_test(vessel):
@@ -398,7 +398,7 @@ def work_on_json(input_data):
 		check_input( data, BUTTON_SOLAR_ON, lambda: expand_solar_arrays( vessel, True))
 		check_input( data, BUTTON_ENGINES_ON, lambda: enable_all_engines( vessel, True))
 		check_input( data, BUTTON_ENGINES_OFF, lambda: enable_all_engines( vessel, False))
-		check_input( data, BUTTON_ABORT, lambda: button_abort( vessel, True))
+		check_input( data, BUTTON_ABORT, lambda: button_abort( vessel ))
 		check_input( data, BUTTON_FUEL, lambda: button_fuel( vessel, True))
 		check_input( data, BUTTON_REACTION_WHEELS, lambda: button_reaction_wheels( vessel, True))
 		check_input( data, BUTTON_STORE, lambda: conn.space_center.quicksave() )
