@@ -15,25 +15,25 @@ from ksp_console import *
 port = "/dev/ttyS3"
 
 class State:
-	last_scene=""
-	# 0 means -> slider
-	# 1 means 100 from button
-	# 2 means 0 from button
-	thrust_state=""
-	last_thrust_from_slider=0
-	sas_mode_list=[
-		SASMode.stability_assist, SASMode.maneuver,
-		SASMode.prograde, SASMode.retrograde,
-		SASMode.normal, SASMode.anti_normal,
-		SASMode.radial, SASMode.anti_radial,
-		SASMode.target, SASMode.anti_target ]
-	current_sas_mode=0
-	num_sas_modess=len(sas_mode_list)
-	speed_mode_list=[ SpeedMode.orbit, SpeedMode.surface, SpeedMode.orbit ]
-	current_speed_mode=0
-	num_speed_modes=len(speed_mode_list)
+	def __init__(self, conn):
+		last_scene=""
+		# 0 means -> slider
+		# 1 means 100 from button
+		# 2 means 0 from button
+		thrust_state=""
+		last_thrust_from_slider=0
+		s = conn.space_center.SASMode
+		sas_mode_list=[
+			s.stability_assist, s.maneuver,
+			s.prograde, s.retrograde, s.normal, s.anti_normal,
+			s.radial, s.anti_radial, s.target, s.anti_target ]
+		current_sas_mode=0
+		num_sas_modess=len(sas_mode_list)
+		s = conn.space_center.SpeedMode
+		speed_mode_list=[ s.orbit, s.surface, s.target ]
+		current_speed_mode=0
+		num_speed_modes=len(speed_mode_list)
 
-state = State()
 status_updates = {}
 
 def serial_read_line():
@@ -370,7 +370,7 @@ def work_on_json(input_data):
 			value = normiere_throttle(data[KSP_INPUT_THRUST])
 			if state.thrust_state==0:
 				control.throttle = value
-			else
+			else:
 				# only set if slider has been moved
 				if abs(state.last_thrust_from_slider-value)>0.05:
 					state.thrust_state=0
@@ -403,7 +403,7 @@ def work_on_json(input_data):
 		check_input( data, BUTTON_REACTION_WHEELS, lambda: button_reaction_wheels( vessel, True))
 		check_input( data, BUTTON_STORE, lambda: conn.space_center.quicksave() )
 		check_input( data, BUTTON_LOAD, lambda: conn.space_center.quickload() )
-		check_input( data, BUTTON_CAMERA, lambda: camera_button(vessel) )
+		check_input( data, BUTTON_CAMERA, lambda: camera_button() )
 		check_input( data, BUTTON_TEST, lambda: button_test(vessel) )
 		check_input( data, BUTTON_EVA, lambda: button_eva(vessel) )
 		check_input( data, BUTTON_IVA, lambda: button_iva(vessel) )
@@ -428,14 +428,15 @@ parser.add_argument("--noksp", help="run without connecting to ksp", action="sto
 args = parser.parse_args()
 if args.noksp:
 	print("noksp: will not connect to KSP")
+else:
+	conn = krpc.connect(name='mk console')
+	state = State(conn)
 
 # no async receives, so it is ok to set a timeout, should
 # make less loops
 ser = serial.Serial(port, 115200, timeout=0)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
-if not args.noksp:
-	conn = krpc.connect(name='mk console')
 
 sleep(3)
 send_handshake()
