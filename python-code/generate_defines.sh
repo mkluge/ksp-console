@@ -3,6 +3,7 @@
 
 PATH_TO_KSP_DISPLAY="../../ksp_main_controller/src"
 PYTHON_INSTALL="/usr/include/python2.7"
+#PYTHON_INSTALL="/cygdrive/c/Users/mkluge/Anaconda3/include"
 
 cp $PATH_TO_KSP_DISPLAY/ksp_display_defines.h .
 swig -python -module ksp_console ksp_display_defines.h

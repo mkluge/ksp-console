@@ -241,8 +241,11 @@ def enable_all_engines( vessel, value):
 def chutes_go( vessel ):
 	global args
 	if not args.noksp:
-		for c in vessel.parts.parachutes:
-			c.deploy()
+		for p in vessel.parts.parachutes:
+			print( "1" )
+			p.deploy()
+	print( "chutes" )
+	sys.stdout.flush()
 
 def full_thrust( vessel ):
 	global state
