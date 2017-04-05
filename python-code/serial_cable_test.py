@@ -33,6 +33,14 @@ class State:
 		self.current_speed_mode=0
 		self.speed_mode_list=[ s.orbit, s.surface, s.target ]
 		self.num_speed_modes=len(self.speed_mode_list)
+		# whether sas was on before the joystick values where
+		# feed into ksp
+		self.last_yaw=0;
+		self.last_pitch=0;
+		self.last_roll=0;
+		self.was_sas_on=False
+		self.last_sas_type=0
+		self.joystick_sas_has_been_handled=False
 
 status_updates = {}
 
@@ -211,6 +219,8 @@ def add_orbit_to_status():
 	if not args.noksp:
 		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
 			return
+		status_updates[str(INFO_PERIAPSIS)] = "n/a"
+		status_updates[str(INFO_PERIAPSIS_TIME)] = "n/a"
 		try:
 			orbit = conn.space_center.active_vessel.orbit
 			status_updates[str(INFO_APOAPSIS)] = int(orbit.apoapsis_altitude)
@@ -218,13 +228,12 @@ def add_orbit_to_status():
 			if orbit.periapsis_altitude>0:
 				status_updates[str(INFO_PERIAPSIS)] = int(orbit.periapsis_altitude)
 				status_updates[str(INFO_PERIAPSIS_TIME)] = time_to_string(int(orbit.time_to_periapsis))
-			else:
-				status_updates[str(INFO_PERIAPSIS)] = "n/a"
-				status_updates[str(INFO_PERIAPSIS_TIME)] = "n/a"
 		except krpc.error.RPCError:
 		 	pass
 		except ValueError:
 		  	pass
+		except OverflowError:
+			pass
 
 def check_input( data, key, fun, *fargs):
 	global args
@@ -335,10 +344,35 @@ def check_input_and_feedback(data, key_str, key, control):
         status_updates[str(key)] = int(getattr( control, key_str))
 
 def check_analog( data, key, control, ckey):
-    if key in data:
-        value = data[key]
-        if not args.noksp:
-            setattr( control, ckey, normiere_joystick(value))
+	global state
+	sas_off_limit=0.15
+	if key in data:
+		value = normiere_joystick(data[key])
+		if not args.noksp:
+			# if SAS is on and we have rotation, disable yaw
+			# and steer
+			if key==KSP_INPUT_YAW:
+				state.last_yaw=value
+			if key==KSP_INPUT_ROLL:
+				state.last_roll=value
+			if key==KSP_INPUT_PITCH:
+				state.last_pitch=value
+			if abs(state.last_yaw)>sas_off_limit or abs(state.last_roll)>sas_off_limit or abs(state.last_pitch)>sas_off_limit:
+				if state.joystick_sas_has_been_handled==False:
+				   	if control.sas==True:
+						state.last_sas_type = control.sas_mode
+						state.was_sas_on = True
+						control.sas = False
+					else:
+						state.was_sas_on = False
+					state.joystick_sas_has_been_handled=True
+			else:
+				if state.was_sas_on == True:
+					control.sas = True
+					control.sas_mode = state.last_sas_type
+					state.sas_was_on = False
+				state.joystick_sas_has_been_handled = False
+			setattr( control, ckey, value)
 
 def work_on_json(input_data):
 	global args
@@ -403,7 +437,7 @@ def work_on_json(input_data):
 		check_input( data, BUTTON_ENGINES_OFF, lambda: enable_all_engines( vessel, False))
 		check_input( data, BUTTON_ABORT, lambda: button_abort( vessel ))
 		check_input( data, BUTTON_FUEL, lambda: button_fuel( vessel, True))
-		check_input( data, BUTTON_REACTION_WHEELS, lambda: button_reaction_wheels( vessel, True))
+		check_input( data, BUTTON_REACTION_WHEELS, lambda: button_reaction_wheels( vessel))
 		check_input( data, BUTTON_STORE, lambda: conn.space_center.quicksave() )
 		check_input( data, BUTTON_LOAD, lambda: conn.space_center.quickload() )
 		check_input( data, BUTTON_CAMERA, lambda: camera_button() )
