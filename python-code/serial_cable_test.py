@@ -345,33 +345,33 @@ def check_input_and_feedback(data, key_str, key, control):
 
 def check_analog( data, key, control, ckey):
 	global state
-	sas_off_limit=0.15
+#	sas_off_limit=0.15
 	if key in data:
 		value = normiere_joystick(data[key])
 		if not args.noksp:
-			# if SAS is on and we have rotation, disable yaw
-			# and steer
-			if key==KSP_INPUT_YAW:
-				state.last_yaw=value
-			if key==KSP_INPUT_ROLL:
-				state.last_roll=value
-			if key==KSP_INPUT_PITCH:
-				state.last_pitch=value
-			if abs(state.last_yaw)>sas_off_limit or abs(state.last_roll)>sas_off_limit or abs(state.last_pitch)>sas_off_limit:
-				if state.joystick_sas_has_been_handled==False:
-				   	if control.sas==True:
-						state.last_sas_type = control.sas_mode
-						state.was_sas_on = True
-						control.sas = False
-					else:
-						state.was_sas_on = False
-					state.joystick_sas_has_been_handled=True
-			else:
-				if state.was_sas_on == True:
-					control.sas = True
-					control.sas_mode = state.last_sas_type
-					state.sas_was_on = False
-				state.joystick_sas_has_been_handled = False
+#			# if SAS is on and we have rotation, disable yaw
+#			# and steer
+#			if key==KSP_INPUT_YAW:
+#				state.last_yaw=value
+#			if key==KSP_INPUT_ROLL:
+#				state.last_roll=value
+#			if key==KSP_INPUT_PITCH:
+#				state.last_pitch=value
+#			if abs(state.last_yaw)>sas_off_limit or abs(state.last_roll)>sas_off_limit or abs(state.last_pitch)>sas_off_limit:
+#				if state.joystick_sas_has_been_handled==False:
+#				   	if control.sas==True:
+#						state.last_sas_type = control.sas_mode
+#						state.was_sas_on = True
+#						control.sas = False
+#					else:
+#						state.was_sas_on = False
+#					state.joystick_sas_has_been_handled=True
+#			else:
+#				if state.was_sas_on == True:
+#					control.sas = True
+#					control.sas_mode = state.last_sas_type
+#					state.sas_was_on = False
+#				state.joystick_sas_has_been_handled = False
 			setattr( control, ckey, value)
 
 def work_on_json(input_data):
