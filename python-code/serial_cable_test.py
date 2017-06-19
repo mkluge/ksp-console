@@ -135,6 +135,15 @@ def send_flight_data():
 			status_updates[str(BUTTON_LIGHTS)] = int(control.lights)
 			status_updates[str(BUTTON_GEAR)] = int(control.gear)
 			status_updates[str(BUTTON_BREAKS)] = int(control.brakes)
+			stage_resources = vessel.resources_in_decouple_stage(stage=control.current_stage, cumulative=False)
+			max_lf = stage_resources.max('LiquidFuel');
+			max_ox = stage_resources.max('Oxidizer');
+			max_mo = stage_resources.max('MonoPropellant');
+			max_el = stage_resources.max('ElectricCharge');
+			status_updates[str(INFO_PERCENTAGE_FUEL)] = stage_resources.amount('LiquidFuel') * 100 / max_lf;
+			status_updates[str(INFO_PERCENTAGE_OXYGEN)] = stage_resources.amount('Oxidizer') * 100 / max_ox;
+			status_updates[str(INFO_PERCENTAGE_RCS)] = stage_resources.amount('MonoPropellant') * 100 / max_mo;
+			status_updates[str(INFO_PERCENTAGE_BATTERY)] = stage_resources.amount('ElectricCharge') * 100 / max_el;
 			send_updates()
 		except krpc.error.RPCError:
 		 	pass
