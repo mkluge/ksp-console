@@ -1,0 +1,4 @@
+_ksp_console.dll
+ksp_console.py
+ksp_display_defines_wrap.c
+ksp_display_defines_wrap.o
