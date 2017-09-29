@@ -12,7 +12,51 @@ import argparse
 from ksp_console import *
 
 #port = "COM4"
-port = "/dev/ttyS3"
+port = "/dev/ttyS2"
+
+class Telemetry:
+	def __init__(self, conn):
+		self.conn = conn
+		vessel = conn.space_center.active_vessel
+		control = vessel.control
+		orbit = vessel.orbit
+
+		# Set up streams for telemetry
+		self.ut = conn.add_stream(getattr, conn.space_center, 'ut')
+		self.altitude = conn.add_stream(getattr, vessel.flight(), 'surface_altitude')
+		self.apoapsis = conn.add_stream(getattr, vessel.orbit, 'apoapsis_altitude')
+		self.speed    = conn.add_stream(getattr, vessel.flight(vessel.orbit.body.reference_frame), 'speed')
+		self.sas      = conn.add_stream(getattr, control, 'sas')
+		self.rcs      = conn.add_stream(getattr, control, 'rcs')
+		self.lights   = conn.add_stream(getattr, control, 'lights')
+		self.gear     = conn.add_stream(getattr, control, 'gear')
+		self.brakes   = conn.add_stream(getattr, control, 'brakes')
+
+	def add_data(self, status_updates):
+		status_updates[str(INFO_HEIGHT)] = self.altitude()
+		status_updates[str(INFO_SPEED)] = self.speed()
+		status_updates[str(BUTTON_SAS)] = self.sas()
+		status_updates[str(BUTTON_RCS)] = self.rcs()
+		status_updates[str(BUTTON_LIGHTS)] = self.lights()
+		status_updates[str(BUTTON_GEAR)] = self.gear()
+		status_updates[str(BUTTON_BREAKS)] = self.brakes()
+		stage_resources = self.vessel.resources_in_decouple_stage(stage=control.current_stage, cumulative=False)
+		max_lf = stage_resources.max('LiquidFuel');
+		max_ox = stage_resources.max('Oxidizer');
+		max_mo = stage_resources.max('MonoPropellant');
+		max_el = stage_resources.max('ElectricCharge');
+		if max_lf!=0:
+			status_updates[str(INFO_PERCENTAGE_FUEL)] = stage_resources.amount('LiquidFuel') * 100 / max_lf;
+		if max_ox!=0:
+			status_updates[str(INFO_PERCENTAGE_OXYGEN)] = stage_resources.amount('Oxidizer') * 100 / max_ox;
+		if max_mo!=0:
+			status_updates[str(INFO_PERCENTAGE_RCS)] = stage_resources.amount('MonoPropellant') * 100 / max_mo;
+		if max_el!=0:
+			status_updates[str(INFO_PERCENTAGE_BATTERY)] = stage_resources.amount('ElectricCharge') * 100 / max_el;
+		add_action_group_status()
+		add_orbit_to_status()
+		add_landing_info()
+		return status_updates
 
 class State:
 	def __init__(self, conn):
@@ -117,37 +161,6 @@ def encode_json_array(arr):
 		res.append(arr[element])
 	return res
 
-def send_flight_data():
-	global args
-	global status_updates
-	global conn
-	if not args.noksp:
-		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
-			return
-		try:
-			vessel = conn.space_center.active_vessel
-			control = vessel.control
-			orbit = vessel.orbit
-			status_updates[str(INFO_HEIGHT)] = int(vessel.flight().surface_altitude)
-			status_updates[str(INFO_SPEED)] = int(vessel.flight(vessel.orbit.body.reference_frame).speed)
-			status_updates[str(BUTTON_SAS)] = int(control.sas)
-			status_updates[str(BUTTON_RCS)] = int(control.rcs)
-			status_updates[str(BUTTON_LIGHTS)] = int(control.lights)
-			status_updates[str(BUTTON_GEAR)] = int(control.gear)
-			status_updates[str(BUTTON_BREAKS)] = int(control.brakes)
-			stage_resources = vessel.resources_in_decouple_stage(stage=control.current_stage, cumulative=False)
-			max_lf = stage_resources.max('LiquidFuel');
-			max_ox = stage_resources.max('Oxidizer');
-			max_mo = stage_resources.max('MonoPropellant');
-			max_el = stage_resources.max('ElectricCharge');
-			status_updates[str(INFO_PERCENTAGE_FUEL)] = stage_resources.amount('LiquidFuel') * 100 / max_lf;
-			status_updates[str(INFO_PERCENTAGE_OXYGEN)] = stage_resources.amount('Oxidizer') * 100 / max_ox;
-			status_updates[str(INFO_PERCENTAGE_RCS)] = stage_resources.amount('MonoPropellant') * 100 / max_mo;
-			status_updates[str(INFO_PERCENTAGE_BATTERY)] = stage_resources.amount('ElectricCharge') * 100 / max_el;
-			send_updates()
-		except krpc.error.RPCError:
-		 	pass
-
 def send_updates():
 	global args
 	global status_updates
@@ -173,8 +186,8 @@ def time_to_string(secs):
 			tap = tap+", "+str(secs-(mins*60))+" sec"
 	else:
 		tap = str(int(secs)) + " sec"
-	return tap
 
+	return tap
 def add_action_group_status():
 	global args
 	global status_updates
@@ -187,13 +200,6 @@ def add_action_group_status():
 			control = vessel.control
 			status=0
 			current_value=1
-			for grp in [1,2,3,4,5,6,7,8,9,0]:
-#				print("Status of group " +str(grp) + " is " + str(control.get_action_group(grp)))
-#				sys.stdout.flush()
-				if control.get_action_group(grp):
-					status = status + current_value
-				current_value = current_value * 2
-			status_updates[str(INFO_ACTION_GROUPS)] = status
 #			print("status of all groups is "+str(status))
 #			sys.stdout.flush()
 		except krpc.error.RPCError:
@@ -477,6 +483,7 @@ if args.noksp:
 else:
 	conn = krpc.connect(name='mk console')
 	state = State(conn)
+	telemetry = Telemetry(conn)
 
 # no async receives, so it is ok to set a timeout, should
 # make less loops
@@ -484,7 +491,7 @@ ser = serial.Serial(port, 115200, timeout=0)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
 
-sleep(3)
+sleep(10)
 send_handshake()
 ref_time = datetime.datetime.now()
 while True:
@@ -494,14 +501,11 @@ while True:
 	# wait for the reply and done
 
 	# every 2 seconds or so: send update to the arduino
-#	if (diff_short.seconds>1 or diff_short.microseconds>200000) and ser.out_waiting == 0:
-	if (time_diff.seconds>2):
+	#if (time_diff.seconds>1 or time_diff.microseconds>300000) and ser.out_waiting == 0:
+	if (time_diff.seconds>1 or time_diff.microseconds>300000):
 		if not args.noksp:
 			if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
-				add_action_group_status()
-				add_orbit_to_status()
-				add_landing_info()
-				ref_time_long = datetime.datetime.now()
+				status_updates = telemetry.add_data(status_updates)
 				send_flight_data()
 		ref_time = now
 
