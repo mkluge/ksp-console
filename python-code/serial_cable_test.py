@@ -12,27 +12,99 @@ import argparse
 from ksp_console import *
 
 #port = "COM4"
-port = "/dev/ttyS2"
+port = "/dev/ttyS5"
 
 class Telemetry:
-	def __init__(self, conn):
+	def __init__(self, conn, args):
 		self.conn = conn
-		vessel = conn.space_center.active_vessel
-		control = vessel.control
-		orbit = vessel.orbit
+		self.args = args
+		self.init_vessel()
 
-		# Set up streams for telemetry
-		self.ut = conn.add_stream(getattr, conn.space_center, 'ut')
-		self.altitude = conn.add_stream(getattr, vessel.flight(), 'surface_altitude')
-		self.apoapsis = conn.add_stream(getattr, vessel.orbit, 'apoapsis_altitude')
-		self.speed    = conn.add_stream(getattr, vessel.flight(vessel.orbit.body.reference_frame), 'speed')
-		self.sas      = conn.add_stream(getattr, control, 'sas')
-		self.rcs      = conn.add_stream(getattr, control, 'rcs')
-		self.lights   = conn.add_stream(getattr, control, 'lights')
-		self.gear     = conn.add_stream(getattr, control, 'gear')
-		self.brakes   = conn.add_stream(getattr, control, 'brakes')
+	def init_vessel(self):
+		try:
+			self.vessel = conn.space_center.active_vessel
+			self.control = self.vessel.control
+			self.orbit = self.vessel.orbit
+			# Set up streams for telemetry
+			self.ut = conn.add_stream(getattr, conn.space_center, 'ut')
+			self.altitude = conn.add_stream(getattr, self.vessel.flight(), 'surface_altitude')
+			self.apoapsis = conn.add_stream(getattr, self.vessel.orbit, 'apoapsis_altitude')
+			self.speed    = conn.add_stream(getattr, self.vessel.flight(self.vessel.orbit.body.reference_frame), 'speed')
+			self.sas      = conn.add_stream(getattr, self.control, 'sas')
+			self.rcs      = conn.add_stream(getattr, self.control, 'rcs')
+			self.lights   = conn.add_stream(getattr, self.control, 'lights')
+			self.gear     = conn.add_stream(getattr, self.control, 'gear')
+			self.brakes   = conn.add_stream(getattr, self.control, 'brakes')
+		except krpc.error.RPCError:
+			self.vessel="none"
+			pass
+
+	def add_action_group_status(self, status_updates):
+		if not self.args.noksp:
+			if self.conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+				return
+			try:
+				vessel = self.conn.space_center.active_vessel
+				control = self.vessel.control
+				status=0
+				current_value=1
+	#			print("status of all groups is "+str(status))
+	#			sys.stdout.flush()
+			except krpc.error.RPCError:
+				pass
+			except ValueError:
+				pass
+		return status_updates
+
+	def	add_orbit_to_status(self, status_updates):
+		if not args.noksp:
+			if self.conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+				return
+			status_updates[str(INFO_PERIAPSIS)] = "n/a"
+			status_updates[str(INFO_PERIAPSIS_TIME)] = "n/a"
+			try:
+				orbit = self.conn.space_center.active_vessel.orbit
+				status_updates[str(INFO_APOAPSIS)] = int(orbit.apoapsis_altitude)
+				status_updates[str(INFO_APOAPSIS_TIME)] = time_to_string(int(orbit.time_to_apoapsis))
+				if orbit.periapsis_altitude>0:
+					status_updates[str(INFO_PERIAPSIS)] = int(orbit.periapsis_altitude)
+					status_updates[str(INFO_PERIAPSIS_TIME)] = time_to_string(int(orbit.time_to_periapsis))
+			except krpc.error.RPCError:
+				pass
+			except ValueError:
+				pass
+			except OverflowError:
+				pass
+		return status_updates
+
+	def	add_landing_info(self, status_updates):
+		if not self.args.noksp:
+			if self.conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+				return
+			try:
+				flight = self.conn.space_center.active_vessel.flight()
+				status_updates[str(INFO_SURFACE_HEIGHT)] = int(flight.surface_altitude)
+				speed = int( self.conn.space_center.active_vessel.flight( self.conn.space_center.active_vessel.orbit.body.reference_frame).vertical_speed)
+				if( speed<0.0 ):
+					status_updates[str(INFO_SURFACE_TIME)] = time_to_string(int(flight.surface_altitude/abs(speed)))
+				else:
+					status_updates[str(INFO_SURFACE_TIME)] = "n/a"
+			except krpc.error.RPCError:
+				pass
+			except ValueError:
+				pass
+		return status_updates
 
 	def add_data(self, status_updates):
+		# if we do not have a vessel: test, if we can get one
+		if self.vessel=="none":
+			self.init_vessel()
+			if self.vessel=="none":
+				return
+		# did the vessel change? then update streams
+		if self.vessel != self.conn.space_center.active_vessel:
+			self.init_vessel()
+
 		status_updates[str(INFO_HEIGHT)] = self.altitude()
 		status_updates[str(INFO_SPEED)] = self.speed()
 		status_updates[str(BUTTON_SAS)] = self.sas()
@@ -40,7 +112,7 @@ class Telemetry:
 		status_updates[str(BUTTON_LIGHTS)] = self.lights()
 		status_updates[str(BUTTON_GEAR)] = self.gear()
 		status_updates[str(BUTTON_BREAKS)] = self.brakes()
-		stage_resources = self.vessel.resources_in_decouple_stage(stage=control.current_stage, cumulative=False)
+		stage_resources = self.vessel.resources_in_decouple_stage(stage=self.control.current_stage, cumulative=False)
 		max_lf = stage_resources.max('LiquidFuel');
 		max_ox = stage_resources.max('Oxidizer');
 		max_mo = stage_resources.max('MonoPropellant');
@@ -53,9 +125,9 @@ class Telemetry:
 			status_updates[str(INFO_PERCENTAGE_RCS)] = stage_resources.amount('MonoPropellant') * 100 / max_mo;
 		if max_el!=0:
 			status_updates[str(INFO_PERCENTAGE_BATTERY)] = stage_resources.amount('ElectricCharge') * 100 / max_el;
-		add_action_group_status()
-		add_orbit_to_status()
-		add_landing_info()
+		status_updates = self.add_action_group_status(status_updates)
+		status_updates = self.add_orbit_to_status(status_updates)
+		status_updates = self.add_landing_info(status_updates)
 		return status_updates
 
 class State:
@@ -85,8 +157,6 @@ class State:
 		self.was_sas_on=False
 		self.last_sas_type=0
 		self.joystick_sas_has_been_handled=False
-
-status_updates = {}
 
 def serial_read_line():
 	global ser
@@ -161,9 +231,8 @@ def encode_json_array(arr):
 		res.append(arr[element])
 	return res
 
-def send_updates():
+def send_updates(status_updates):
 	global args
-	global status_updates
 	global conn
 	if not args.noksp:
 		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
@@ -173,7 +242,7 @@ def send_updates():
 			send_serial( CMD_UPDATE_CONSOLE, {"data":send_data})
 			status_updates={}
 		except krpc.error.RPCError:
-		 	pass
+			pass
 
 def time_to_string(secs):
 	if secs<0:
@@ -188,67 +257,7 @@ def time_to_string(secs):
 		tap = str(int(secs)) + " sec"
 
 	return tap
-def add_action_group_status():
-	global args
-	global status_updates
-	global conn
-	if not args.noksp:
-		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
-			return
-		try:
-			vessel = conn.space_center.active_vessel
-			control = vessel.control
-			status=0
-			current_value=1
-#			print("status of all groups is "+str(status))
-#			sys.stdout.flush()
-		except krpc.error.RPCError:
-			pass
-		except ValueError:
-			pass
 
-def add_landing_info():
-    global args
-    global status_updates
-    global conn
-    if not args.noksp:
-        if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
-            return
-        try:
-            flight = conn.space_center.active_vessel.flight()
-            status_updates[str(INFO_SURFACE_HEIGHT)] = int(flight.surface_altitude)
-            speed = int( conn.space_center.active_vessel.flight( conn.space_center.active_vessel.orbit.body.reference_frame).vertical_speed)
-            if( speed<0.0 ):
-                status_updates[str(INFO_SURFACE_TIME)] = time_to_string(int(flight.surface_altitude/abs(speed)))
-            else:
-                status_updates[str(INFO_SURFACE_TIME)] = "n/a"
-        except krpc.error.RPCError:
-            pass
-        except ValueError:
-            pass
-
-def add_orbit_to_status():
-	global args
-	global status_updates
-	global conn
-	if not args.noksp:
-		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
-			return
-		status_updates[str(INFO_PERIAPSIS)] = "n/a"
-		status_updates[str(INFO_PERIAPSIS_TIME)] = "n/a"
-		try:
-			orbit = conn.space_center.active_vessel.orbit
-			status_updates[str(INFO_APOAPSIS)] = int(orbit.apoapsis_altitude)
-			status_updates[str(INFO_APOAPSIS_TIME)] = time_to_string(int(orbit.time_to_apoapsis))
-			if orbit.periapsis_altitude>0:
-				status_updates[str(INFO_PERIAPSIS)] = int(orbit.periapsis_altitude)
-				status_updates[str(INFO_PERIAPSIS_TIME)] = time_to_string(int(orbit.time_to_periapsis))
-		except krpc.error.RPCError:
-		 	pass
-		except ValueError:
-		  	pass
-		except OverflowError:
-			pass
 
 def check_input( data, key, fun, *fargs):
 	global args
@@ -349,14 +358,12 @@ def expand_solar_arrays( vessel, value):
 		for solar in vessel.parts.solar_panels:
 			solar.deployed = value
 
-def check_input_and_feedback(data, key_str, key, control):
-    global args
-    global status_updates
-    global conn
-    if key in data and not args.noksp:
-        if bool(data[key]):
-            setattr( control, key_str, not getattr( control, key_str))
-        status_updates[str(key)] = int(getattr( control, key_str))
+def check_input_and_feedback( data, key_str, key, control):
+	global args
+	global conn
+	if key in data and not args.noksp:
+		if bool(data[key]):
+			setattr( control, key_str, not getattr( control, key_str))
 
 def check_analog( data, key, control, ckey):
 	global state
@@ -391,7 +398,6 @@ def check_analog( data, key, control, ckey):
 
 def work_on_json(input_data):
 	global args
-	global status_updates
 	global conn
 	global state
 
@@ -483,11 +489,11 @@ if args.noksp:
 else:
 	conn = krpc.connect(name='mk console')
 	state = State(conn)
-	telemetry = Telemetry(conn)
+	telemetry = Telemetry(conn, args)
 
 # no async receives, so it is ok to set a timeout, should
 # make less loops
-ser = serial.Serial(port, 115200, timeout=0)
+ser = serial.Serial( port, 115200, timeout=0)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
 
@@ -505,8 +511,9 @@ while True:
 	if (time_diff.seconds>1 or time_diff.microseconds>300000):
 		if not args.noksp:
 			if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
+				status_updates = {}
 				status_updates = telemetry.add_data(status_updates)
-				send_flight_data()
+				send_updates(status_updates)
 		ref_time = now
 
 	# read the current status and button updates and so on
@@ -525,6 +532,3 @@ while True:
 		except ValueError:
 			print('Decoding JSON failed for: '+lines[0])
 	work_on_json(serial_data)
-	# if this generated updates -> send them right away
-	if len(status_updates)>0:
-		send_updates()
