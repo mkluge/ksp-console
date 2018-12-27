@@ -497,7 +497,7 @@ ser = serial.Serial( port, 115200, timeout=0)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
 
-sleep(10)
+sleep(15)
 send_handshake()
 ref_time = datetime.datetime.now()
 while True:
