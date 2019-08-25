@@ -105,13 +105,13 @@ class Telemetry:
 		if self.vessel != self.conn.space_center.active_vessel:
 			self.init_vessel()
 
-		status_updates[str(INFO_HEIGHT)] = self.altitude()
-		status_updates[str(INFO_SPEED)] = self.speed()
-		status_updates[str(BUTTON_SAS)] = self.sas()
-		status_updates[str(BUTTON_RCS)] = self.rcs()
-		status_updates[str(BUTTON_LIGHTS)] = self.lights()
-		status_updates[str(BUTTON_GEAR)] = self.gear()
-		status_updates[str(BUTTON_BREAKS)] = self.brakes()
+		status_updates[str(INFO_HEIGHT)] = int(self.altitude())
+		status_updates[str(INFO_SPEED)] = int(self.speed())
+		status_updates[str(BUTTON_SAS)] = 1 if self.sas() else 0
+		status_updates[str(BUTTON_RCS)] = 1 if self.rcs() else 0
+		status_updates[str(BUTTON_LIGHTS)] = 1 if self.lights() else 0
+		status_updates[str(BUTTON_GEAR)] = 1 if self.gear() else 0
+		status_updates[str(BUTTON_BREAKS)] = 1 if self.brakes() else 0
 		stage_resources = self.vessel.resources_in_decouple_stage(stage=self.control.current_stage, cumulative=False)
 		max_lf = stage_resources.max('LiquidFuel');
 		max_ox = stage_resources.max('Oxidizer');
@@ -493,11 +493,12 @@ else:
 
 # no async receives, so it is ok to set a timeout, should
 # make less loops
-ser = serial.Serial( port, 115200, timeout=0)
+# ser = serial.Serial( port, 115200, timeout=0)
+ser = serial.Serial( port, 115200)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
 
-sleep(15)
+sleep(5)
 send_handshake()
 ref_time = datetime.datetime.now()
 while True:
