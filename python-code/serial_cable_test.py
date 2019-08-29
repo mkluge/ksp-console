@@ -10,6 +10,8 @@ import sys
 import json
 import argparse
 from ksp_console import *
+import signal
+
 
 #port = "COM4"
 port = "/dev/ttyS5"
@@ -475,61 +477,84 @@ def work_on_json(input_data):
 	except krpc.error.RPCError:
 		pass
 
-## main
+# main
+def main_function():
 
-last_chip_data = 0
-parser = argparse.ArgumentParser()
-parser.add_argument("--debugsend", help="print data sent to con", action="store_true")
-parser.add_argument("--debugrecv", help="print some received from con", action="store_true")
-parser.add_argument("--debugchip", help="print chip debug output", action="store_true")
-parser.add_argument("--noksp", help="run without connecting to ksp", action="store_true")
-args = parser.parse_args()
-if args.noksp:
-	print("noksp: will not connect to KSP")
-else:
-	conn = krpc.connect(name='mk console')
-	state = State(conn)
-	telemetry = Telemetry(conn, args)
+	last_chip_data = 0
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--debugsend", help="print data sent to con", action="store_true")
+	parser.add_argument("--debugrecv", help="print some received from con", action="store_true")
+	parser.add_argument("--debugchip", help="print chip debug output", action="store_true")
+	parser.add_argument("--noksp", help="run without connecting to ksp", action="store_true")
+	args = parser.parse_args()
 
-# no async receives, so it is ok to set a timeout, should
-# make less loops
-# ser = serial.Serial( port, 115200, timeout=0)
-ser = serial.Serial( port, 115200)
-ser.reset_input_buffer()
-ser.reset_output_buffer()
-
-sleep(5)
-send_handshake()
-ref_time = datetime.datetime.now()
-while True:
-	now = datetime.datetime.now()
-	time_diff = now - ref_time
-	# this works command driven, so we send commands,
-	# wait for the reply and done
-
-	# every 2 seconds or so: send update to the arduino
-	#if (time_diff.seconds>1 or time_diff.microseconds>300000) and ser.out_waiting == 0:
-	if (time_diff.seconds>1 or time_diff.microseconds>300000):
-		if not args.noksp:
-			if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
-				status_updates = {}
-				status_updates = telemetry.add_data(status_updates)
-				send_updates(status_updates)
-		ref_time = now
-
-	# read the current status and button updates and so on
-	send_serial( CMD_GET_UPDATES, {})
-	serial_data=serial_read_line()
-#	if args.debugrecv:
-#		print( decode_json_array(serial_data["data"]) )
-#		sys.stdout.flush()
-	if args.debugchip:
+	serial_connected = False
+	krpc_connected = False
+	# run forever (until ctrl-c)
+	while True:
 		try:
-			data = json.loads(serial_data)
-			if "chip" in data and data["chip"]!=last_chip_data:
-				print("Chip: "+str(data["chip"]))
-				last_chip_data = data["chip"]
-				sys.stdout.flush()
-		except ValueError:
-			print('Decoding JSON failed for: '+lines[0])
-	work_on_json(serial_data)
+			# first: try to connect everything
+			if krpc_connected == False and not args.noksp:
+				conn = krpc.connect(name='mk console')
+				state = State(conn)
+				telemetry = Telemetry(conn, args)
+				krpc_connected = true
+				sleep(5)
+				send_handshake()
+				ref_time = datetime.datetime.now()
+
+			if serial_connected == False:
+				ser = serial.Serial( port, 115200, timeout=0)
+				ser.reset_input_buffer()
+				ser.reset_output_buffer()
+				serial_connected = True
+
+			if serial_connected and krpc_connected:
+				while True:
+					now = datetime.datetime.now()
+					time_diff = now - ref_time
+					# this works command driven, so we send commands,
+					# wait for the reply and done
+
+					# every 2 seconds or so: send update to the arduino
+					#if (time_diff.seconds>1 or time_diff.microseconds>300000) and ser.out_waiting == 0:
+					if (time_diff.seconds>1 or time_diff.microseconds>300000):
+						if not args.noksp:
+							if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
+								status_updates = {}
+								status_updates = telemetry.add_data(status_updates)
+								send_updates(status_updates)
+						ref_time = now
+
+					# read the current status and button updates and so on
+					send_serial( CMD_GET_UPDATES, {})
+					serial_data=serial_read_line()
+				#	if args.debugrecv:
+				#		print( decode_json_array(serial_data["data"]) )
+				#		sys.stdout.flush()
+					if args.debugchip:
+						try:
+							data = json.loads(serial_data)
+							if "chip" in data and data["chip"]!=last_chip_data:
+								print("Chip: "+str(data["chip"]))
+								last_chip_data = data["chip"]
+								sys.stdout.flush()
+						except ValueError:
+							print('Decoding JSON failed for: '+lines[0])
+					work_on_json(serial_data)
+			else:
+				print( "Connection missing: KRPC:%s Serial:%s" %
+					("online" if krpc_connected: else "offline",
+					 "connected" if krpc_connected: else "disconnected")
+				# not everything connected, sleep and try again
+				time.sleep(1)
+
+		except serial.SerialException:
+			serial_connected = False
+			pass
+		except krpc.error.RPCError:
+			krpc_connected = False
+			pass
+
+if __name__ == '__main__':
+    main_function()
