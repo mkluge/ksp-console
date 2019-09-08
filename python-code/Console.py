@@ -14,7 +14,9 @@ import signal
 
 
 #port = "COM4"
-port = "/dev/ttyS5"
+port = "/dev/ttyS6"
+ser = ""
+args = ""
 
 class Telemetry:
 	def __init__(self, conn, args):
@@ -221,6 +223,7 @@ def send_serial( command, send_data):
 
 def decode_json_array(arr):
 	res={}
+	print(len(arr))
 	for index in range( 0, len(arr), 2):
 #		if int(arr[index])>7:
 		res[arr[index]]=arr[index+1]
@@ -474,11 +477,16 @@ def work_on_json(input_data):
 		check_input( data, BUTTON_CHUTES, lambda: chutes_go(vessel) )
 	except ValueError:
 		print('Decoding JSON failed')
-	except krpc.error.RPCError:
-		pass
+#	except krpc.error.RPCError:
+#		pass
 
 # main
 def main_function():
+	global ser
+	global args
+	global conn
+	global state
+	global telemetry
 
 	last_chip_data = 0
 	parser = argparse.ArgumentParser()
@@ -498,40 +506,61 @@ def main_function():
 				conn = krpc.connect(name='mk console')
 				state = State(conn)
 				telemetry = Telemetry(conn, args)
-				krpc_connected = true
-				sleep(5)
-				send_handshake()
+				krpc_connected = True
 				ref_time = datetime.datetime.now()
+		except (krpc.error.RPCError, ConnectionRefusedError):
+			krpc_connected = False
+			pass
 
+		try:
 			if serial_connected == False:
+				print("trying serial")
 				ser = serial.Serial( port, 115200, timeout=0)
 				ser.reset_input_buffer()
 				ser.reset_output_buffer()
+				sleep(5)
+				print("sending handshake")
+				send_handshake()
+				print("serial OK")
 				serial_connected = True
+		except (serial.SerialException, ConnectionRefusedError):
+			print("serial failed")
+			serial_connected = False
+			pass
 
+		try:
 			if serial_connected and krpc_connected:
 				while True:
+					# we have two types of commands
+					# 1) just requests data, there is a response
+					# 2) just send data to the arduino, there is no response
+					# so, after we have send one of type 1 we know we have
+					# to wait for a reply before we can send again
+					# after we send one of type 2) we don't know how long
+					# the processing in the arduino is going to take, so
+					# we always send after a command of type 2 one type 1
+					# command
+
 					now = datetime.datetime.now()
 					time_diff = now - ref_time
 					# this works command driven, so we send commands,
 					# wait for the reply and done
 
-					# every 2 seconds or so: send update to the arduino
+					# every 1-2 seconds: send update to the arduino
 					#if (time_diff.seconds>1 or time_diff.microseconds>300000) and ser.out_waiting == 0:
-					if (time_diff.seconds>1 or time_diff.microseconds>300000):
-						if not args.noksp:
-							if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
-								status_updates = {}
-								status_updates = telemetry.add_data(status_updates)
-								send_updates(status_updates)
+					if (time_diff.seconds>1 or time_diff.microseconds>100000):
+						if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
+							status_updates = {}
+							status_updates = telemetry.add_data(status_updates)
+							send_updates(status_updates)
 						ref_time = now
 
 					# read the current status and button updates and so on
 					send_serial( CMD_GET_UPDATES, {})
 					serial_data=serial_read_line()
-				#	if args.debugrecv:
-				#		print( decode_json_array(serial_data["data"]) )
-				#		sys.stdout.flush()
+					if args.debugrecv:
+						print(serial_data)
+						sys.stdout.flush()
 					if args.debugchip:
 						try:
 							data = json.loads(serial_data)
@@ -543,17 +572,16 @@ def main_function():
 							print('Decoding JSON failed for: '+lines[0])
 					work_on_json(serial_data)
 			else:
-				print( "Connection missing: KRPC:%s Serial:%s" %
-					("online" if krpc_connected: else "offline",
-					 "connected" if krpc_connected: else "disconnected")
 				# not everything connected, sleep and try again
-				time.sleep(1)
-
+				print( "Connection missing: KRPC:%s Serial:%s\n" %
+					   ("online" if krpc_connected else "offline",
+						"connected" if serial_connected else "disconnected"))
+				sleep(1)
+		except (krpc.error.RPCError, ConnectionRefusedError):
+			krpc_connected = False
+			pass
 		except serial.SerialException:
 			serial_connected = False
-			pass
-		except krpc.error.RPCError:
-			krpc_connected = False
 			pass
 
 if __name__ == '__main__':
