@@ -462,7 +462,7 @@ def work_on_json(input_data):
 		check_input( data, BUTTON_ENGINES_ON, lambda: enable_all_engines( vessel, True))
 		check_input( data, BUTTON_ENGINES_OFF, lambda: enable_all_engines( vessel, False))
 		check_input( data, BUTTON_ABORT, lambda: button_abort( vessel ))
-		check_input( data, BUTTON_FUEL, lambda: button_fuel( vessel, True))
+		check_input( data, BUTTON_FUEL, lambda: button_fuel( vessel))
 		check_input( data, BUTTON_REACTION_WHEELS, lambda: button_reaction_wheels( vessel))
 		check_input( data, BUTTON_STORE, lambda: conn.space_center.quicksave() )
 		check_input( data, BUTTON_LOAD, lambda: conn.space_center.quickload() )
