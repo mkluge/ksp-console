@@ -1,0 +1,2059 @@
+trying serial
+sending handshake
+serial OK
+18
+collectData: 1265.00 ms
+sendUpdates: 222.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 129.00 ms
+workJson: 53.00 ms
+update process: 220.00 ms
+16
+collectData: 7.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 152.00 ms
+workJson: 8.00 ms
+update process: 196.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 110.00 ms
+workJson: 12.00 ms
+update process: 157.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 154.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 129.00 ms
+workJson: 9.00 ms
+update process: 178.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 155.00 ms
+send GET_UPDATES: 66.00 ms
+readline: 130.00 ms
+workJson: 106.00 ms
+update process: 302.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 45.00 ms
+readline: 121.00 ms
+workJson: 3.00 ms
+update process: 170.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 162.00 ms
+workJson: 386.00 ms
+update process: 585.00 ms
+16
+collectData: 965.00 ms
+sendUpdates: 160.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 152.00 ms
+workJson: 320.00 ms
+update process: 510.00 ms
+16
+collectData: 887.00 ms
+sendUpdates: 166.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 92.00 ms
+workJson: 97.00 ms
+update process: 226.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 147.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 102.00 ms
+workJson: 12.00 ms
+update process: 152.00 ms
+16
+collectData: 26.00 ms
+sendUpdates: 171.00 ms
+send GET_UPDATES: 33.00 ms
+readline: 127.00 ms
+workJson: 6.00 ms
+update process: 168.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 44.00 ms
+readline: 134.00 ms
+workJson: 31.00 ms
+update process: 210.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 33.00 ms
+readline: 135.00 ms
+workJson: 8.00 ms
+update process: 178.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 147.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 120.00 ms
+workJson: 9.00 ms
+update process: 168.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 167.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 123.00 ms
+workJson: 42.00 ms
+update process: 202.00 ms
+16
+collectData: 49.00 ms
+sendUpdates: 131.00 ms
+send GET_UPDATES: 46.00 ms
+readline: 125.00 ms
+workJson: 11.00 ms
+update process: 184.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 167.00 ms
+send GET_UPDATES: 70.00 ms
+readline: 131.00 ms
+workJson: 13.00 ms
+update process: 215.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 127.00 ms
+workJson: 7.00 ms
+update process: 171.00 ms
+16
+collectData: 21.00 ms
+sendUpdates: 132.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 157.00 ms
+workJson: 9.00 ms
+update process: 202.00 ms
+16
+collectData: 34.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 116.00 ms
+workJson: 39.00 ms
+update process: 190.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 158.00 ms
+send GET_UPDATES: 32.00 ms
+readline: 132.00 ms
+workJson: 30.00 ms
+update process: 194.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 148.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 108.00 ms
+workJson: 32.00 ms
+update process: 177.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 168.00 ms
+send GET_UPDATES: 68.00 ms
+readline: 132.00 ms
+workJson: 4.00 ms
+update process: 205.00 ms
+16
+collectData: 49.00 ms
+sendUpdates: 147.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 118.00 ms
+workJson: 13.00 ms
+update process: 168.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 132.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 128.00 ms
+workJson: 7.00 ms
+update process: 172.00 ms
+16
+collectData: 34.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 140.00 ms
+workJson: 12.00 ms
+update process: 188.00 ms
+16
+collectData: 61.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 121.00 ms
+workJson: 29.00 ms
+update process: 187.00 ms
+16
+collectData: 15.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 113.00 ms
+workJson: 22.00 ms
+update process: 174.00 ms
+16
+collectData: 15.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 113.00 ms
+workJson: 23.00 ms
+update process: 172.00 ms
+16
+collectData: 51.00 ms
+sendUpdates: 189.00 ms
+send GET_UPDATES: 60.00 ms
+readline: 139.00 ms
+workJson: 22.00 ms
+update process: 222.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 139.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 130.00 ms
+workJson: 27.00 ms
+update process: 192.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 135.00 ms
+workJson: 18.00 ms
+update process: 190.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 131.00 ms
+workJson: 4.00 ms
+update process: 173.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 134.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 115.00 ms
+workJson: 35.00 ms
+update process: 186.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 133.00 ms
+workJson: 33.00 ms
+update process: 202.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 137.00 ms
+workJson: 14.00 ms
+update process: 187.00 ms
+16
+collectData: 50.00 ms
+sendUpdates: 133.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 133.00 ms
+workJson: 10.00 ms
+update process: 181.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 119.00 ms
+send GET_UPDATES: 49.00 ms
+readline: 134.00 ms
+workJson: 9.00 ms
+update process: 192.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 133.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 138.00 ms
+workJson: 26.00 ms
+update process: 200.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 134.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 126.00 ms
+workJson: 6.00 ms
+update process: 169.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 132.00 ms
+workJson: 24.00 ms
+update process: 191.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 140.00 ms
+send GET_UPDATES: 57.00 ms
+readline: 135.00 ms
+workJson: 23.00 ms
+update process: 216.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 45.00 ms
+readline: 136.00 ms
+workJson: 14.00 ms
+update process: 196.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 159.00 ms
+send GET_UPDATES: 46.00 ms
+readline: 139.00 ms
+workJson: 17.00 ms
+update process: 204.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 71.00 ms
+readline: 147.00 ms
+workJson: 9.00 ms
+update process: 228.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 138.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 129.00 ms
+workJson: 5.00 ms
+update process: 171.00 ms
+16
+collectData: 24.00 ms
+sendUpdates: 166.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 112.00 ms
+workJson: 23.00 ms
+update process: 174.00 ms
+16
+collectData: 21.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 127.00 ms
+workJson: 6.00 ms
+update process: 169.00 ms
+18
+collectData: 51.00 ms
+sendUpdates: 169.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 109.00 ms
+workJson: 924.00 ms
+update process: 1082.00 ms
+18
+collectData: 11.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 46.00 ms
+readline: 149.00 ms
+workJson: 27.00 ms
+update process: 223.00 ms
+16
+collectData: 37.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 32.00 ms
+readline: 143.00 ms
+workJson: 9.00 ms
+update process: 187.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 151.00 ms
+send GET_UPDATES: 31.00 ms
+readline: 133.00 ms
+workJson: 7.00 ms
+update process: 173.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 150.00 ms
+send GET_UPDATES: 33.00 ms
+readline: 140.00 ms
+workJson: 26.00 ms
+update process: 201.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 133.00 ms
+workJson: 6.00 ms
+update process: 175.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 26.00 ms
+readline: 146.00 ms
+workJson: 52.00 ms
+update process: 226.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 47.00 ms
+readline: 145.00 ms
+workJson: 5.00 ms
+update process: 198.00 ms
+16
+collectData: 38.00 ms
+sendUpdates: 158.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 129.00 ms
+workJson: 25.00 ms
+update process: 193.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 115.00 ms
+workJson: 15.00 ms
+update process: 166.00 ms
+16
+collectData: 52.00 ms
+sendUpdates: 154.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 156.00 ms
+workJson: 13.00 ms
+update process: 206.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 174.00 ms
+send GET_UPDATES: 25.00 ms
+readline: 148.00 ms
+workJson: 22.00 ms
+update process: 195.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 174.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 134.00 ms
+workJson: 5.00 ms
+update process: 175.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 59.00 ms
+readline: 139.00 ms
+workJson: 22.00 ms
+update process: 221.00 ms
+16
+collectData: 34.00 ms
+sendUpdates: 130.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 146.00 ms
+workJson: 4.00 ms
+update process: 187.00 ms
+16
+collectData: 24.00 ms
+sendUpdates: 129.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 126.00 ms
+workJson: 6.00 ms
+update process: 181.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 147.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 126.00 ms
+workJson: 6.00 ms
+update process: 169.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 155.00 ms
+send GET_UPDATES: 59.00 ms
+readline: 148.00 ms
+workJson: 21.00 ms
+update process: 229.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 151.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 142.00 ms
+workJson: 7.00 ms
+update process: 186.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 143.00 ms
+workJson: 28.00 ms
+update process: 207.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 147.00 ms
+send GET_UPDATES: 59.00 ms
+readline: 127.00 ms
+workJson: 3.00 ms
+update process: 191.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 148.00 ms
+send GET_UPDATES: 58.00 ms
+readline: 131.00 ms
+workJson: 19.00 ms
+update process: 208.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 181.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 127.00 ms
+workJson: 23.00 ms
+update process: 185.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 170.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 139.00 ms
+workJson: 52.00 ms
+update process: 229.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 156.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 126.00 ms
+workJson: 24.00 ms
+update process: 187.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 136.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 128.00 ms
+workJson: 15.00 ms
+update process: 180.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 67.00 ms
+readline: 143.00 ms
+workJson: 28.00 ms
+update process: 240.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 154.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 126.00 ms
+workJson: 23.00 ms
+update process: 186.00 ms
+16
+collectData: 34.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 137.00 ms
+workJson: 3.00 ms
+update process: 178.00 ms
+16
+collectData: 66.00 ms
+sendUpdates: 176.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 140.00 ms
+workJson: 19.00 ms
+update process: 196.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 165.00 ms
+send GET_UPDATES: 56.00 ms
+readline: 139.00 ms
+workJson: 16.00 ms
+update process: 211.00 ms
+16
+collectData: 23.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 142.00 ms
+workJson: 25.00 ms
+update process: 216.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 162.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 132.00 ms
+workJson: 4.00 ms
+update process: 171.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 143.00 ms
+workJson: 22.00 ms
+update process: 203.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 145.00 ms
+workJson: 22.00 ms
+update process: 204.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 130.00 ms
+workJson: 3.00 ms
+update process: 171.00 ms
+18
+collectData: 11.00 ms
+sendUpdates: 165.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 144.00 ms
+workJson: 26.00 ms
+update process: 207.00 ms
+18
+collectData: 37.00 ms
+sendUpdates: 152.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 157.00 ms
+workJson: 5.00 ms
+update process: 199.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 165.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 136.00 ms
+workJson: 10.00 ms
+update process: 182.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 139.00 ms
+workJson: 8.00 ms
+update process: 185.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 132.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 146.00 ms
+workJson: 4.00 ms
+update process: 184.00 ms
+16
+collectData: 26.00 ms
+sendUpdates: 140.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 142.00 ms
+workJson: 48.00 ms
+update process: 227.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 145.00 ms
+workJson: 5.00 ms
+update process: 186.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 140.00 ms
+workJson: 9.00 ms
+update process: 186.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 154.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 139.00 ms
+workJson: 33.00 ms
+update process: 211.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 49.00 ms
+readline: 137.00 ms
+workJson: 16.00 ms
+update process: 203.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 134.00 ms
+workJson: 6.00 ms
+update process: 179.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 151.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 143.00 ms
+workJson: 28.00 ms
+update process: 207.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 173.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 129.00 ms
+workJson: 13.00 ms
+update process: 179.00 ms
+16
+collectData: 23.00 ms
+sendUpdates: 169.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 141.00 ms
+workJson: 19.00 ms
+update process: 197.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 126.00 ms
+workJson: 33.00 ms
+update process: 195.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 152.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 126.00 ms
+workJson: 14.00 ms
+update process: 175.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 137.00 ms
+workJson: 7.00 ms
+update process: 180.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 135.00 ms
+workJson: 20.00 ms
+update process: 191.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 140.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 131.00 ms
+workJson: 16.00 ms
+update process: 183.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 147.00 ms
+workJson: 8.00 ms
+update process: 192.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 33.00 ms
+readline: 144.00 ms
+workJson: 26.00 ms
+update process: 205.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 149.00 ms
+workJson: 31.00 ms
+update process: 218.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 47.00 ms
+readline: 143.00 ms
+workJson: 22.00 ms
+update process: 213.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 150.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 124.00 ms
+workJson: 22.00 ms
+update process: 182.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 184.00 ms
+send GET_UPDATES: 33.00 ms
+readline: 139.00 ms
+workJson: 4.00 ms
+update process: 177.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 39.00 ms
+readline: 148.00 ms
+workJson: 17.00 ms
+update process: 205.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 157.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 148.00 ms
+workJson: 15.00 ms
+update process: 202.00 ms
+16
+collectData: 26.00 ms
+sendUpdates: 153.00 ms
+send GET_UPDATES: 32.00 ms
+readline: 124.00 ms
+workJson: 22.00 ms
+update process: 178.00 ms
+16
+collectData: 58.00 ms
+sendUpdates: 154.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 145.00 ms
+workJson: 16.00 ms
+update process: 199.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 145.00 ms
+workJson: 6.00 ms
+update process: 187.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 33.00 ms
+readline: 132.00 ms
+workJson: 9.00 ms
+update process: 176.00 ms
+16
+collectData: 24.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 47.00 ms
+readline: 143.00 ms
+workJson: 25.00 ms
+update process: 217.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 171.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 144.00 ms
+workJson: 21.00 ms
+update process: 202.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 49.00 ms
+readline: 148.00 ms
+workJson: 40.00 ms
+update process: 238.00 ms
+16
+collectData: 9.00 ms
+sendUpdates: 158.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 139.00 ms
+workJson: 13.00 ms
+update process: 189.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 61.00 ms
+readline: 130.00 ms
+workJson: 9.00 ms
+update process: 201.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 167.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 130.00 ms
+workJson: 7.00 ms
+update process: 174.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 156.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 135.00 ms
+workJson: 3.00 ms
+update process: 173.00 ms
+16
+collectData: 26.00 ms
+sendUpdates: 140.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 141.00 ms
+workJson: 37.00 ms
+update process: 215.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 45.00 ms
+readline: 146.00 ms
+workJson: 10.00 ms
+update process: 201.00 ms
+16
+collectData: 9.00 ms
+sendUpdates: 154.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 138.00 ms
+workJson: 20.00 ms
+update process: 194.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 148.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 150.00 ms
+workJson: 41.00 ms
+update process: 226.00 ms
+16
+collectData: 9.00 ms
+sendUpdates: 147.00 ms
+send GET_UPDATES: 70.00 ms
+readline: 133.00 ms
+workJson: 47.00 ms
+update process: 252.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 117.00 ms
+workJson: 11.00 ms
+update process: 167.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 70.00 ms
+readline: 132.00 ms
+workJson: 23.00 ms
+update process: 227.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 66.00 ms
+readline: 118.00 ms
+workJson: 5.00 ms
+update process: 190.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 155.00 ms
+send GET_UPDATES: 46.00 ms
+readline: 129.00 ms
+workJson: 35.00 ms
+update process: 211.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 33.00 ms
+readline: 128.00 ms
+workJson: 17.00 ms
+update process: 179.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 150.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 151.00 ms
+workJson: 11.00 ms
+update process: 200.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 139.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 117.00 ms
+workJson: 5.00 ms
+update process: 160.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 139.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 124.00 ms
+workJson: 31.00 ms
+update process: 190.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 142.00 ms
+workJson: 11.00 ms
+update process: 190.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 150.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 154.00 ms
+workJson: 3.00 ms
+update process: 192.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 134.00 ms
+workJson: 3.00 ms
+update process: 186.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 129.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 146.00 ms
+workJson: 39.00 ms
+update process: 220.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 175.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 142.00 ms
+workJson: 17.00 ms
+update process: 194.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 137.00 ms
+workJson: 13.00 ms
+update process: 188.00 ms
+16
+collectData: 20.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 145.00 ms
+workJson: 7.00 ms
+update process: 188.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 149.00 ms
+workJson: 8.00 ms
+update process: 193.00 ms
+16
+collectData: 54.00 ms
+sendUpdates: 156.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 141.00 ms
+workJson: 22.00 ms
+update process: 199.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 149.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 137.00 ms
+workJson: 17.00 ms
+update process: 190.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 25.00 ms
+readline: 151.00 ms
+workJson: 5.00 ms
+update process: 182.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 130.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 147.00 ms
+workJson: 8.00 ms
+update process: 192.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 66.00 ms
+readline: 142.00 ms
+workJson: 11.00 ms
+update process: 220.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 129.00 ms
+workJson: 12.00 ms
+update process: 177.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 136.00 ms
+workJson: 22.00 ms
+update process: 207.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 46.00 ms
+readline: 153.00 ms
+workJson: 6.00 ms
+update process: 207.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 59.00 ms
+readline: 114.00 ms
+workJson: 15.00 ms
+update process: 189.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 130.00 ms
+workJson: 14.00 ms
+update process: 183.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 151.00 ms
+workJson: 4.00 ms
+update process: 191.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 156.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 153.00 ms
+workJson: 27.00 ms
+update process: 218.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 130.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 131.00 ms
+workJson: 19.00 ms
+update process: 188.00 ms
+16
+collectData: 55.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 126.00 ms
+workJson: 22.00 ms
+update process: 184.00 ms
+16
+collectData: 23.00 ms
+sendUpdates: 150.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 144.00 ms
+workJson: 16.00 ms
+update process: 199.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 181.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 117.00 ms
+workJson: 11.00 ms
+update process: 165.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 132.00 ms
+workJson: 66.00 ms
+update process: 234.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 165.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 133.00 ms
+workJson: 24.00 ms
+update process: 193.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 124.00 ms
+workJson: 17.00 ms
+update process: 178.00 ms
+16
+collectData: 20.00 ms
+sendUpdates: 139.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 137.00 ms
+workJson: 11.00 ms
+update process: 185.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 144.00 ms
+workJson: 26.00 ms
+update process: 206.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 155.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 126.00 ms
+workJson: 4.00 ms
+update process: 167.00 ms
+16
+collectData: 8.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 117.00 ms
+workJson: 9.00 ms
+update process: 162.00 ms
+16
+collectData: 24.00 ms
+sendUpdates: 140.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 142.00 ms
+workJson: 27.00 ms
+update process: 205.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 153.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 147.00 ms
+workJson: 15.00 ms
+update process: 198.00 ms
+16
+collectData: 23.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 143.00 ms
+workJson: 3.00 ms
+update process: 184.00 ms
+16
+collectData: 18.00 ms
+sendUpdates: 171.00 ms
+send GET_UPDATES: 33.00 ms
+readline: 117.00 ms
+workJson: 51.00 ms
+update process: 203.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 142.00 ms
+workJson: 19.00 ms
+update process: 198.00 ms
+16
+collectData: 34.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 123.00 ms
+workJson: 14.00 ms
+update process: 173.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 53.00 ms
+readline: 127.00 ms
+workJson: 19.00 ms
+update process: 200.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 168.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 179.00 ms
+workJson: 379.00 ms
+update process: 597.00 ms
+16
+collectData: 1044.00 ms
+sendUpdates: 170.00 ms
+send GET_UPDATES: 39.00 ms
+readline: 187.00 ms
+workJson: 339.00 ms
+update process: 566.00 ms
+16
+collectData: 642.00 ms
+sendUpdates: 167.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 151.00 ms
+workJson: 59.00 ms
+update process: 247.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 144.00 ms
+workJson: 10.00 ms
+update process: 203.00 ms
+16
+collectData: 14.00 ms
+sendUpdates: 157.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 137.00 ms
+workJson: 49.00 ms
+update process: 222.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 173.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 153.00 ms
+workJson: 34.00 ms
+update process: 224.00 ms
+16
+collectData: 26.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 132.00 ms
+workJson: 9.00 ms
+update process: 190.00 ms
+16
+collectData: 35.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 46.00 ms
+readline: 147.00 ms
+workJson: 26.00 ms
+update process: 221.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 70.00 ms
+readline: 147.00 ms
+workJson: 30.00 ms
+update process: 248.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 159.00 ms
+send GET_UPDATES: 70.00 ms
+readline: 140.00 ms
+workJson: 19.00 ms
+update process: 230.00 ms
+16
+collectData: 48.00 ms
+sendUpdates: 149.00 ms
+send GET_UPDATES: 68.00 ms
+readline: 145.00 ms
+workJson: 6.00 ms
+update process: 219.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 182.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 125.00 ms
+workJson: 19.00 ms
+update process: 180.00 ms
+16
+collectData: 51.00 ms
+sendUpdates: 169.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 140.00 ms
+workJson: 51.00 ms
+update process: 229.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 46.00 ms
+readline: 143.00 ms
+workJson: 31.00 ms
+update process: 221.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 147.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 133.00 ms
+workJson: 6.00 ms
+update process: 175.00 ms
+16
+collectData: 44.00 ms
+sendUpdates: 176.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 124.00 ms
+workJson: 53.00 ms
+update process: 214.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 147.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 148.00 ms
+workJson: 23.00 ms
+update process: 208.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 177.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 136.00 ms
+workJson: 13.00 ms
+update process: 185.00 ms
+16
+collectData: 14.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 153.00 ms
+workJson: 18.00 ms
+update process: 207.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 39.00 ms
+readline: 126.00 ms
+workJson: 64.00 ms
+update process: 231.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 152.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 151.00 ms
+workJson: 13.00 ms
+update process: 202.00 ms
+16
+collectData: 26.00 ms
+sendUpdates: 151.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 153.00 ms
+workJson: 5.00 ms
+update process: 198.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 169.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 148.00 ms
+workJson: 19.00 ms
+update process: 202.00 ms
+16
+collectData: 26.00 ms
+sendUpdates: 196.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 123.00 ms
+workJson: 10.00 ms
+update process: 167.00 ms
+16
+collectData: 42.00 ms
+sendUpdates: 196.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 147.00 ms
+workJson: 13.00 ms
+update process: 197.00 ms
+16
+collectData: 45.00 ms
+sendUpdates: 203.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 141.00 ms
+workJson: 5.00 ms
+update process: 183.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 179.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 136.00 ms
+workJson: 29.00 ms
+update process: 203.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 179.00 ms
+send GET_UPDATES: 33.00 ms
+readline: 135.00 ms
+workJson: 21.00 ms
+update process: 190.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 113.00 ms
+workJson: 12.00 ms
+update process: 161.00 ms
+16
+collectData: 39.00 ms
+sendUpdates: 200.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 107.00 ms
+workJson: 6.00 ms
+update process: 149.00 ms
+16
+collectData: 25.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 157.00 ms
+workJson: 34.00 ms
+update process: 228.00 ms
+16
+collectData: 26.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 124.00 ms
+workJson: 14.00 ms
+update process: 173.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 133.00 ms
+workJson: 45.00 ms
+update process: 215.00 ms
+16
+collectData: 14.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 47.00 ms
+readline: 140.00 ms
+workJson: 5.00 ms
+update process: 192.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 154.00 ms
+send GET_UPDATES: 46.00 ms
+readline: 138.00 ms
+workJson: 28.00 ms
+update process: 214.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 157.00 ms
+send GET_UPDATES: 69.00 ms
+readline: 141.00 ms
+workJson: 44.00 ms
+update process: 255.00 ms
+16
+collectData: 23.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 47.00 ms
+readline: 134.00 ms
+workJson: 9.00 ms
+update process: 190.00 ms
+16
+collectData: 39.00 ms
+sendUpdates: 148.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 145.00 ms
+workJson: 22.00 ms
+update process: 206.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 167.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 136.00 ms
+workJson: 14.00 ms
+update process: 188.00 ms
+16
+collectData: 14.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 141.00 ms
+workJson: 25.00 ms
+update process: 202.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 138.00 ms
+workJson: 20.00 ms
+update process: 194.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 161.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 127.00 ms
+workJson: 21.00 ms
+update process: 197.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 149.00 ms
+workJson: 6.00 ms
+update process: 191.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 155.00 ms
+send GET_UPDATES: 58.00 ms
+readline: 140.00 ms
+workJson: 16.00 ms
+update process: 215.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 142.00 ms
+workJson: 15.00 ms
+update process: 193.00 ms
+16
+collectData: 27.00 ms
+sendUpdates: 159.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 120.00 ms
+workJson: 10.00 ms
+update process: 170.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 147.00 ms
+workJson: 6.00 ms
+update process: 191.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 153.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 150.00 ms
+workJson: 13.00 ms
+update process: 202.00 ms
+16
+collectData: 23.00 ms
+sendUpdates: 149.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 147.00 ms
+workJson: 20.00 ms
+update process: 204.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 176.00 ms
+send GET_UPDATES: 26.00 ms
+readline: 133.00 ms
+workJson: 27.00 ms
+update process: 187.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 116.00 ms
+workJson: 10.00 ms
+update process: 162.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 190.00 ms
+send GET_UPDATES: 26.00 ms
+readline: 134.00 ms
+workJson: 15.00 ms
+update process: 176.00 ms
+16
+collectData: 48.00 ms
+sendUpdates: 213.00 ms
+send GET_UPDATES: 25.00 ms
+readline: 121.00 ms
+workJson: 4.00 ms
+update process: 150.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 177.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 104.00 ms
+workJson: 19.00 ms
+update process: 159.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 200.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 133.00 ms
+workJson: 29.00 ms
+update process: 200.00 ms
+16
+collectData: 20.00 ms
+sendUpdates: 187.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 114.00 ms
+workJson: 11.00 ms
+update process: 161.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 171.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 129.00 ms
+workJson: 13.00 ms
+update process: 177.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 194.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 110.00 ms
+workJson: 13.00 ms
+update process: 159.00 ms
+18
+collectData: 20.00 ms
+sendUpdates: 167.00 ms
+send GET_UPDATES: 45.00 ms
+readline: 142.00 ms
+workJson: 654.00 ms
+update process: 842.00 ms
+18
+send GET_UPDATES: 71.00 ms
+readline: 144.00 ms
+workJson: 33.00 ms
+update process: 249.00 ms
+16
+collectData: 21.00 ms
+sendUpdates: 179.00 ms
+send GET_UPDATES: 57.00 ms
+readline: 134.00 ms
+workJson: 7.00 ms
+update process: 199.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 138.00 ms
+workJson: 29.00 ms
+update process: 205.00 ms
+16
+collectData: 19.00 ms
+sendUpdates: 188.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 124.00 ms
+workJson: 47.00 ms
+update process: 206.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 218.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 135.00 ms
+workJson: 14.00 ms
+update process: 185.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 181.00 ms
+send GET_UPDATES: 67.00 ms
+readline: 126.00 ms
+workJson: 6.00 ms
+update process: 201.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 176.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 109.00 ms
+workJson: 43.00 ms
+update process: 189.00 ms
+16
+collectData: 23.00 ms
+sendUpdates: 181.00 ms
+send GET_UPDATES: 71.00 ms
+readline: 130.00 ms
+workJson: 8.00 ms
+update process: 210.00 ms
+16
+collectData: 35.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 68.00 ms
+readline: 133.00 ms
+workJson: 32.00 ms
+update process: 234.00 ms
+16
+collectData: 35.00 ms
+sendUpdates: 174.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 135.00 ms
+workJson: 19.00 ms
+update process: 192.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 179.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 131.00 ms
+workJson: 52.00 ms
+update process: 218.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 66.00 ms
+readline: 131.00 ms
+workJson: 20.00 ms
+update process: 218.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 45.00 ms
+readline: 125.00 ms
+workJson: 18.00 ms
+update process: 189.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 200.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 119.00 ms
+workJson: 15.00 ms
+update process: 172.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 175.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 112.00 ms
+workJson: 41.00 ms
+update process: 191.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 177.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 124.00 ms
+workJson: 11.00 ms
+update process: 173.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 177.00 ms
+send GET_UPDATES: 26.00 ms
+readline: 116.00 ms
+workJson: 3.00 ms
+update process: 146.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 174.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 159.00 ms
+workJson: 29.00 ms
+update process: 224.00 ms
+16
+collectData: 19.00 ms
+sendUpdates: 191.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 133.00 ms
+workJson: 3.00 ms
+update process: 174.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 190.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 115.00 ms
+workJson: 8.00 ms
+update process: 161.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 176.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 129.00 ms
+workJson: 16.00 ms
+update process: 193.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 181.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 129.00 ms
+workJson: 19.00 ms
+update process: 186.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 176.00 ms
+send GET_UPDATES: 47.00 ms
+readline: 108.00 ms
+workJson: 17.00 ms
+update process: 173.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 181.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 120.00 ms
+workJson: 22.00 ms
+update process: 178.00 ms
+18
+collectData: 31.00 ms
+sendUpdates: 184.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 126.00 ms
+workJson: 8.00 ms
+update process: 169.00 ms
+18
+collectData: 30.00 ms
+sendUpdates: 179.00 ms
+send GET_UPDATES: 38.00 ms
+readline: 113.00 ms
+workJson: 4.00 ms
+update process: 155.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 171.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 139.00 ms
+workJson: 19.00 ms
+update process: 195.00 ms
+16
+collectData: 36.00 ms
+sendUpdates: 190.00 ms
+send GET_UPDATES: 52.00 ms
+readline: 129.00 ms
+workJson: 22.00 ms
+update process: 205.00 ms
+16
+collectData: 13.00 ms
+sendUpdates: 178.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 128.00 ms
+workJson: 8.00 ms
+update process: 173.00 ms
+16
+collectData: 33.00 ms
+sendUpdates: 209.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 116.00 ms
+workJson: 4.00 ms
+update process: 155.00 ms
+16
+collectData: 19.00 ms
+sendUpdates: 132.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 131.00 ms
+workJson: 11.00 ms
+update process: 180.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 135.00 ms
+workJson: 24.00 ms
+update process: 195.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 57.00 ms
+readline: 133.00 ms
+workJson: 18.00 ms
+update process: 209.00 ms
+18
+collectData: 12.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 133.00 ms
+workJson: 608.00 ms
+update process: 778.00 ms
+18
+collectData: 27.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 45.00 ms
+readline: 138.00 ms
+workJson: 27.00 ms
+update process: 211.00 ms
+16
+collectData: 47.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 139.00 ms
+workJson: 30.00 ms
+update process: 219.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 156.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 122.00 ms
+workJson: 33.00 ms
+update process: 190.00 ms
+16
+collectData: 22.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 139.00 ms
+workJson: 6.00 ms
+update process: 182.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 128.00 ms
+workJson: 11.00 ms
+update process: 174.00 ms
+16
+collectData: 31.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 45.00 ms
+readline: 127.00 ms
+workJson: 24.00 ms
+update process: 197.00 ms
+16
+collectData: 37.00 ms
+sendUpdates: 129.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 140.00 ms
+workJson: 35.00 ms
+update process: 225.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 58.00 ms
+readline: 139.00 ms
+workJson: 59.00 ms
+update process: 256.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 45.00 ms
+readline: 113.00 ms
+workJson: 46.00 ms
+update process: 206.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 155.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 133.00 ms
+workJson: 24.00 ms
+update process: 195.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 148.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 136.00 ms
+workJson: 16.00 ms
+update process: 188.00 ms
+16
+collectData: 23.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 69.00 ms
+readline: 136.00 ms
+workJson: 27.00 ms
+update process: 233.00 ms
+16
+collectData: 11.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 46.00 ms
+readline: 132.00 ms
+workJson: 23.00 ms
+update process: 202.00 ms
+16
+collectData: 9.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 137.00 ms
+workJson: 6.00 ms
+update process: 181.00 ms
+16
+collectData: 21.00 ms
+sendUpdates: 154.00 ms
+send GET_UPDATES: 24.00 ms
+readline: 141.00 ms
+workJson: 30.00 ms
+update process: 196.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 48.00 ms
+readline: 123.00 ms
+workJson: 37.00 ms
+update process: 209.00 ms
+16
+collectData: 12.00 ms
+sendUpdates: 167.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 136.00 ms
+workJson: 21.00 ms
+update process: 193.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 144.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 133.00 ms
+workJson: 23.00 ms
+update process: 193.00 ms
+16
+collectData: 34.00 ms
+sendUpdates: 141.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 118.00 ms
+workJson: 6.00 ms
+update process: 159.00 ms
+16
+collectData: 28.00 ms
+sendUpdates: 166.00 ms
+send GET_UPDATES: 56.00 ms
+readline: 126.00 ms
+workJson: 33.00 ms
+update process: 216.00 ms
+16
+collectData: 29.00 ms
+sendUpdates: 146.00 ms
+send GET_UPDATES: 34.00 ms
+readline: 141.00 ms
+workJson: 12.00 ms
+update process: 188.00 ms
+16
+collectData: 10.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 126.00 ms
+workJson: 7.00 ms
+update process: 169.00 ms
+16
+collectData: 32.00 ms
+sendUpdates: 160.00 ms
+send GET_UPDATES: 37.00 ms
+readline: 140.00 ms
+workJson: 24.00 ms
+update process: 202.00 ms
+16
+collectData: 30.00 ms
+sendUpdates: 168.00 ms
+send GET_UPDATES: 35.00 ms
+readline: 135.00 ms
+workJson: 20.00 ms
+update process: 192.00 ms
+16
+collectData: 82.00 ms
+sendUpdates: 143.00 ms
+send GET_UPDATES: 59.00 ms
+readline: 123.00 ms
+workJson: 10.00 ms
+update process: 193.00 ms
+16
+collectData: 143.00 ms
+sendUpdates: 145.00 ms
+send GET_UPDATES: 47.00 ms
+readline: 114.00 ms
+workJson: 64.00 ms
+update process: 226.00 ms
+16
+collectData: 104.00 ms
+sendUpdates: 142.00 ms
+send GET_UPDATES: 36.00 ms
+readline: 141.00 ms
+workJson: 71.00 ms
+update process: 250.00 ms
+16
+collectData: 337.00 ms
+sendUpdates: 175.00 ms
+send GET_UPDATES: 71.00 ms
+readline: 141.00 ms
+workJson: 270.00 ms
+update process: 483.00 ms

@@ -14,37 +14,9 @@ import signal
 
 
 #port = "COM4"
-port = "/dev/ttyS6"
+port = "/dev/ttyS5"
 ser = ""
 args = ""
-
-class PerfData:
-	def __init__(self):
-		self.clear()
-
-	def startTimer( self, name):
-		self.timers[name] = datetime.datetime.now()
-
-	def stopTimer( self, name):
-		stop = datetime.datetime.now()
-		if not name in self.timers.keys():
-			print("can't stop timer %s, has not been started yet" % (name))
-			return
-		delta = stop - self.timers[name]
-		ms_diff = int(delta.total_seconds() * 1000)
-		self.set( name, ms_diff)
-		del self.timers[name]
-
-	def set( self, key, value):
-		self.values[key]=value
-	
-	def clear( self):
-		self.values={}
-		self.timers={}
-
-	def dump( self):
-		for key in self.values.keys():
-			print("%s: %.2f ms" % (key, self.values[key]))
 
 class Telemetry:
 	def __init__(self, conn, args):
@@ -76,7 +48,7 @@ class Telemetry:
 			if self.conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
 				return
 			try:
-				#vessel = self.conn.space_center.active_vessel
+				vessel = self.conn.space_center.active_vessel
 				control = self.vessel.control
 				status=0
 				current_value=1
@@ -389,10 +361,7 @@ def expand_solar_arrays( vessel, value):
 	global args
 	if not args.noksp:
 		for solar in vessel.parts.solar_panels:
-			try:
-				solar.deployed = value
-			except:
-				pass
+			solar.deployed = value
 
 def check_input_and_feedback( data, key_str, key, control):
 	global args
@@ -493,7 +462,7 @@ def work_on_json(input_data):
 		check_input( data, BUTTON_ENGINES_ON, lambda: enable_all_engines( vessel, True))
 		check_input( data, BUTTON_ENGINES_OFF, lambda: enable_all_engines( vessel, False))
 		check_input( data, BUTTON_ABORT, lambda: button_abort( vessel ))
-		check_input( data, BUTTON_FUEL, lambda: button_fuel( vessel))
+		check_input( data, BUTTON_FUEL, lambda: button_fuel( vessel, True))
 		check_input( data, BUTTON_REACTION_WHEELS, lambda: button_reaction_wheels( vessel))
 		check_input( data, BUTTON_STORE, lambda: conn.space_center.quicksave() )
 		check_input( data, BUTTON_LOAD, lambda: conn.space_center.quickload() )
@@ -518,9 +487,7 @@ def main_function():
 	global conn
 	global state
 	global telemetry
-	global perf_data
 
-	perf_data = PerfData()
 	last_chip_data = 0
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--debugsend", help="print data sent to con", action="store_true")
@@ -548,7 +515,7 @@ def main_function():
 		try:
 			if serial_connected == False:
 				print("trying serial")
-				ser = serial.Serial( port, 115200, timeout=2)
+				ser = serial.Serial( port, 115200, timeout=0)
 				ser.reset_input_buffer()
 				ser.reset_output_buffer()
 				sleep(5)
@@ -584,22 +551,13 @@ def main_function():
 					if (time_diff.seconds>1 or time_diff.microseconds>100000):
 						if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
 							status_updates = {}
-							perf_data.startTimer("collectData");
 							status_updates = telemetry.add_data(status_updates)
-							perf_data.stopTimer("collectData");
-							perf_data.startTimer("sendUpdates");
 							send_updates(status_updates)
-							perf_data.stopTimer("sendUpdates");
 						ref_time = now
 
 					# read the current status and button updates and so on
-					perf_data.startTimer("update process");
-					perf_data.startTimer("send GET_UPDATES");
 					send_serial( CMD_GET_UPDATES, {})
-					perf_data.stopTimer("send GET_UPDATES");
-					perf_data.startTimer("readline");
 					serial_data=serial_read_line()
-					perf_data.stopTimer("readline");
 					if args.debugrecv:
 						print(serial_data)
 						sys.stdout.flush()
@@ -612,12 +570,7 @@ def main_function():
 								sys.stdout.flush()
 						except ValueError:
 							print('Decoding JSON failed for: '+lines[0])
-					perf_data.startTimer("workJson");
 					work_on_json(serial_data)
-					perf_data.stopTimer("workJson");
-					perf_data.stopTimer("update process")
-					perf_data.dump()
-					perf_data.clear()
 			else:
 				# not everything connected, sleep and try again
 				print( "Connection missing: KRPC:%s Serial:%s\n" %
