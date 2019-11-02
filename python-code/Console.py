@@ -223,7 +223,7 @@ def send_handshake():
 	send_data["start"] = 2016
 	send_serial( CMD_INIT, send_data)
 
-def send_serial( command, send_data):
+def send_serial( command, send_data, chunksize=400):
 	global args
 	global ser
 	send_data["cmd"]=command;
@@ -237,8 +237,8 @@ def send_serial( command, send_data):
 	len_data = str(len(data))+":"
 	ser.write(len_data.encode('iso8859-1'))
 	while( len(data)>0 ):
-		send_pkt = data[:32]
-		data = data[32:]
+		send_pkt = data[:chunksize]
+		data = data[chunksize:]
 		ser.write(send_pkt)
 		ser.flush()
 		response = ""
@@ -581,7 +581,7 @@ def main_function():
 
 					# every 1-2 seconds: send update to the arduino
 					#if (time_diff.seconds>1 or time_diff.microseconds>300000) and ser.out_waiting == 0:
-					if (time_diff.seconds>1 or time_diff.microseconds>100000):
+					if (time_diff.seconds>2 ):
 						if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
 							status_updates = {}
 							perf_data.startTimer("collectData");
