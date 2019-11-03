@@ -227,15 +227,15 @@ def send_serial( command, send_data, chunksize=400):
 	global args
 	global ser
 	send_data["cmd"]=command;
-	data=json.dumps(send_data,separators=(',',':'))+"\n"
+	data=json.dumps(send_data,separators=(',',':'))+'+'
+	data = data.encode('iso8859-1')
 	if args.debugsend:
 		print("sending %d bytes " % len(data))
-		print("send: "+data)
+		print("send: "+str(data))
 		sys.stdout.flush()
-	data = data.encode('iso8859-1')
 	#got to send in 32 byte chunks to avoid loosing stuff
-	len_data = str(len(data))+":"
-	ser.write(len_data.encode('iso8859-1'))
+#	len_data = str(len(data))+":"
+#	ser.write(len_data.encode('iso8859-1'))
 	while( len(data)>0 ):
 		send_pkt = data[:chunksize]
 		data = data[chunksize:]
