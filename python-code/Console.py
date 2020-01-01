@@ -14,7 +14,8 @@ import signal
 
 
 #port = "COM4"
-port = "/dev/ttyS6"
+#port = "/dev/ttyS6"
+port = "/dev/ttyS4"
 ser = ""
 args = ""
 
@@ -78,8 +79,6 @@ class Telemetry:
 			try:
 				#vessel = self.conn.space_center.active_vessel
 				control = self.vessel.control
-				status=0
-				current_value=1
 	#			print("status of all groups is "+str(status))
 	#			sys.stdout.flush()
 			except krpc.error.RPCError:
@@ -127,7 +126,7 @@ class Telemetry:
 				pass
 		return status_updates
 
-	def add_data(self, status_updates):
+	def add_main_data(self, status_updates):
 		# if we do not have a vessel: test, if we can get one
 		if self.vessel=="none":
 			self.init_vessel()
@@ -144,23 +143,38 @@ class Telemetry:
 		status_updates[str(BUTTON_LIGHTS)] = 1 if self.lights() else 0
 		status_updates[str(BUTTON_GEAR)] = 1 if self.gear() else 0
 		status_updates[str(BUTTON_BREAKS)] = 1 if self.brakes() else 0
-		stage_resources = self.vessel.resources_in_decouple_stage(stage=self.control.current_stage, cumulative=False)
-		max_lf = stage_resources.max('LiquidFuel');
-		max_ox = stage_resources.max('Oxidizer');
-		max_mo = stage_resources.max('MonoPropellant');
-		max_el = stage_resources.max('ElectricCharge');
-		if max_lf!=0:
-			status_updates[str(INFO_PERCENTAGE_FUEL)] = stage_resources.amount('LiquidFuel') * 100 / max_lf;
-		if max_ox!=0:
-			status_updates[str(INFO_PERCENTAGE_OXYGEN)] = stage_resources.amount('Oxidizer') * 100 / max_ox;
-		if max_mo!=0:
-			status_updates[str(INFO_PERCENTAGE_RCS)] = stage_resources.amount('MonoPropellant') * 100 / max_mo;
-		if max_el!=0:
-			status_updates[str(INFO_PERCENTAGE_BATTERY)] = stage_resources.amount('ElectricCharge') * 100 / max_el;
 		status_updates = self.add_action_group_status(status_updates)
-		status_updates = self.add_orbit_to_status(status_updates)
-		status_updates = self.add_landing_info(status_updates)
 		return status_updates
+
+	def add_display_data(self):
+		display_data = {}
+		# if we do not have a vessel: test, if we can get one
+		if self.vessel=="none":
+			self.init_vessel()
+			if self.vessel=="none":
+				return
+		# did the vessel change? then update streams
+		if self.vessel != self.conn.space_center.active_vessel:
+			self.init_vessel()
+
+		display_data[str(INFO_HEIGHT)] = int(self.altitude())
+		display_data[str(INFO_SPEED)] = int(self.speed())
+		stage_resources = self.vessel.resources_in_decouple_stage(stage=self.control.current_stage, cumulative=False)
+		max_lf = stage_resources.max('LiquidFuel')
+		max_ox = stage_resources.max('Oxidizer')
+		max_mo = stage_resources.max('MonoPropellant')
+		max_el = stage_resources.max('ElectricCharge')
+		if max_lf!=0:
+			display_data[str(INFO_PERCENTAGE_FUEL)] = stage_resources.amount('LiquidFuel') * 100 / max_lf
+		if max_ox!=0:
+			display_data[str(INFO_PERCENTAGE_OXYGEN)] = stage_resources.amount('Oxidizer') * 100 / max_ox
+		if max_mo!=0:
+			display_data[str(INFO_PERCENTAGE_RCS)] = stage_resources.amount('MonoPropellant') * 100 / max_mo
+		if max_el!=0:
+			display_data[str(INFO_PERCENTAGE_BATTERY)] = stage_resources.amount('ElectricCharge') * 100 / max_el
+		display_data = self.add_orbit_to_status(display_data)
+		display_data = self.add_landing_info(display_data)
+		return display_data
 
 class State:
 	def __init__(self, conn):
@@ -183,9 +197,9 @@ class State:
 		self.num_speed_modes=len(self.speed_mode_list)
 		# whether sas was on before the joystick values where
 		# feed into ksp
-		self.last_yaw=0;
-		self.last_pitch=0;
-		self.last_roll=0;
+		self.last_yaw=0
+		self.last_pitch=0
+		self.last_roll=0
 		self.was_sas_on=False
 		self.last_sas_type=0
 		self.joystick_sas_has_been_handled=False
@@ -213,10 +227,10 @@ def normiere_joystick(value):
 
 def normiere_throttle(value):
 	if value<20:
-		return 0;
+		return 0
 	if value>890:
-		return 1;
-	return float(value)/1000.0;
+		return 1
+	return float(value)/1000.0
 
 def send_handshake():
 	send_data = {}
@@ -226,7 +240,7 @@ def send_handshake():
 def send_serial( command, send_data, chunksize=400):
 	global args
 	global ser
-	send_data["cmd"]=command;
+	send_data["cmd"]=command
 	data=json.dumps(send_data,separators=(',',':'))+'+'
 	data = data.encode('iso8859-1')
 	if args.debugsend:
@@ -264,7 +278,19 @@ def encode_json_array(arr):
 		res.append(arr[element])
 	return res
 
-def send_updates(status_updates):
+def send_display_update(status_updates):
+	global args
+	global conn
+	if not args.noksp:
+		if conn.krpc.current_game_scene!=conn.krpc.GameScene.flight:
+			return
+		try:
+			send_data = encode_json_array(status_updates)
+			send_serial( CMD_UPDATE_DISPLAY, {"disp":send_data})
+		except krpc.error.RPCError:
+			pass
+
+def send_main_update(status_updates):
 	global args
 	global conn
 	if not args.noksp:
@@ -273,7 +299,6 @@ def send_updates(status_updates):
 		try:
 			send_data = encode_json_array(status_updates)
 			send_serial( CMD_UPDATE_CONSOLE, {"data":send_data})
-			status_updates={}
 		except krpc.error.RPCError:
 			pass
 
@@ -562,8 +587,10 @@ def main_function():
 			pass
 
 		try:
+			should_send = False
 			if serial_connected and krpc_connected:
 				while True:
+
 					# we have two types of commands
 					# 1) just requests data, there is a response
 					# 2) just send data to the arduino, there is no response
@@ -581,25 +608,38 @@ def main_function():
 
 					# every 1-2 seconds: send update to the arduino
 					#if (time_diff.seconds>1 or time_diff.microseconds>300000) and ser.out_waiting == 0:
-					if (time_diff.seconds>2 ):
+					if (time_diff.seconds>1 ):
 						if conn.krpc.current_game_scene==conn.krpc.GameScene.flight:
-							status_updates = {}
-							perf_data.startTimer("collectData");
-							status_updates = telemetry.add_data(status_updates)
-							perf_data.stopTimer("collectData");
-							perf_data.startTimer("sendUpdates");
-							send_updates(status_updates)
-							perf_data.stopTimer("sendUpdates");
+							# send main controller data
+							main_updates = {}
+							perf_data.startTimer("collectMainData")
+							main_updates = telemetry.add_main_data(main_updates)
+							perf_data.stopTimer("collectMianData")
+							perf_data.startTimer("sendMainUpdates")
+							send_main_update(main_updates)
+							perf_data.stopTimer("sendMainUpdates")
+							# every second time: also send display update
+							if should_send==True:
+								display_updates = {}
+								perf_data.startTimer("collectDisplayData")
+								display_updates = telemetry.add_display_data()
+								perf_data.stopTimer("collectDisplayData")
+								perf_data.startTimer("sendDisplayUpdates")
+								send_display_update(display_updates)
+								perf_data.stopTimer("sendDisplayUpdates")
+								should_send = False
+							else:
+								should_send = True
 						ref_time = now
 
 					# read the current status and button updates and so on
-					perf_data.startTimer("update process");
-					perf_data.startTimer("send GET_UPDATES");
+					perf_data.startTimer("update process")
+					perf_data.startTimer("send GET_UPDATES")
 					send_serial( CMD_GET_UPDATES, {})
-					perf_data.stopTimer("send GET_UPDATES");
-					perf_data.startTimer("readline");
+					perf_data.stopTimer("send GET_UPDATES")
+					perf_data.startTimer("readline")
 					serial_data=serial_read_line()
-					perf_data.stopTimer("readline");
+					perf_data.stopTimer("readline")
 					if args.debugrecv:
 						print(serial_data)
 						sys.stdout.flush()
@@ -612,9 +652,9 @@ def main_function():
 								sys.stdout.flush()
 						except ValueError:
 							print('Decoding JSON failed for: '+lines[0])
-					perf_data.startTimer("workJson");
+					perf_data.startTimer("workJson")
 					work_on_json(serial_data)
-					perf_data.stopTimer("workJson");
+					perf_data.stopTimer("workJson")
 					perf_data.stopTimer("update process")
 					perf_data.dump()
 					perf_data.clear()
