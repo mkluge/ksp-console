@@ -620,7 +620,6 @@ def main_function():
 							perf_data.stopTimer("sendMainUpdates")
 							# every second time: also send display update
 							if should_send==True:
-								display_updates = {}
 								perf_data.startTimer("collectDisplayData")
 								display_updates = telemetry.add_display_data()
 								perf_data.stopTimer("collectDisplayData")
