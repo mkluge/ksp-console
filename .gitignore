@@ -1,3 +1,7 @@
 /main_controller/Release/*
 /.metadata
 /RemoteSystemsTempFiles
+python-code/__pycache__/ksp_console.cpython-36.pyc
+python-code/Console_Debug_Keys.py
+python-code/console.log
+python-code/__pycache__/ksp_console.cpython-36.pyc
