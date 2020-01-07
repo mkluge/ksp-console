@@ -614,7 +614,7 @@ def main_function():
 							main_updates = {}
 							perf_data.startTimer("collectMainData")
 							main_updates = telemetry.add_main_data(main_updates)
-							perf_data.stopTimer("collectMianData")
+							perf_data.stopTimer("collectMainData")
 							perf_data.startTimer("sendMainUpdates")
 							send_main_update(main_updates)
 							perf_data.stopTimer("sendMainUpdates")
@@ -626,7 +626,8 @@ def main_function():
 								perf_data.startTimer("sendDisplayUpdates")
 								send_display_update(display_updates)
 								perf_data.stopTimer("sendDisplayUpdates")
-								should_send = False
+								should_send=False
+#disabled to omit sending display data
 							else:
 								should_send = True
 						ref_time = now
