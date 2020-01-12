@@ -55,6 +55,7 @@ class Telemetry:
 
 	def init_vessel(self):
 		try:
+			conn = self.conn
 			self.vessel = conn.space_center.active_vessel
 			self.control = self.vessel.control
 			self.orbit = self.vessel.orbit
@@ -95,10 +96,10 @@ class Telemetry:
 			status_updates[str(INFO_PERIAPSIS_TIME)] = "n/a"
 			try:
 				orbit = self.conn.space_center.active_vessel.orbit
-				status_updates[str(INFO_APOAPSIS)] = int(orbit.apoapsis_altitude)
+				status_updates[str(INFO_APOAPSIS)] = str(int(orbit.apoapsis_altitude))
 				status_updates[str(INFO_APOAPSIS_TIME)] = time_to_string(int(orbit.time_to_apoapsis))
 				if orbit.periapsis_altitude>0:
-					status_updates[str(INFO_PERIAPSIS)] = int(orbit.periapsis_altitude)
+					status_updates[str(INFO_PERIAPSIS)] = str(int(orbit.periapsis_altitude))
 					status_updates[str(INFO_PERIAPSIS_TIME)] = time_to_string(int(orbit.time_to_periapsis))
 			except krpc.error.RPCError:
 				pass
@@ -159,19 +160,28 @@ class Telemetry:
 
 		display_data[str(INFO_HEIGHT)] = int(self.altitude())
 		display_data[str(INFO_SPEED)] = int(self.speed())
-		stage_resources = self.vessel.resources_in_decouple_stage(stage=self.control.current_stage, cumulative=False)
+#		stage_resources = self.vessel.resources_in_decouple_stage(stage=self.control.current_stage, cumulative=False)
+		stage_resources = self.vessel.resources
 		max_lf = stage_resources.max('LiquidFuel')
 		max_ox = stage_resources.max('Oxidizer')
 		max_mo = stage_resources.max('MonoPropellant')
 		max_el = stage_resources.max('ElectricCharge')
 		if max_lf!=0:
-			display_data[str(INFO_PERCENTAGE_FUEL)] = stage_resources.amount('LiquidFuel') * 100 / max_lf
+			display_data[str(INFO_PERCENTAGE_FUEL)] = int(stage_resources.amount('LiquidFuel') * 100 / max_lf)
+		else:
+			display_data[str(INFO_PERCENTAGE_FUEL)] = 0
 		if max_ox!=0:
-			display_data[str(INFO_PERCENTAGE_OXYGEN)] = stage_resources.amount('Oxidizer') * 100 / max_ox
+			display_data[str(INFO_PERCENTAGE_OXYGEN)] = int(stage_resources.amount('Oxidizer') * 100 / max_ox)
+		else:
+			display_data[str(INFO_PERCENTAGE_OXYGEN)] = 0
 		if max_mo!=0:
-			display_data[str(INFO_PERCENTAGE_RCS)] = stage_resources.amount('MonoPropellant') * 100 / max_mo
+			display_data[str(INFO_PERCENTAGE_RCS)] = int(stage_resources.amount('MonoPropellant') * 100 / max_mo)
+		else:
+			display_data[str(INFO_PERCENTAGE_RCS)] = 0
 		if max_el!=0:
-			display_data[str(INFO_PERCENTAGE_BATTERY)] = stage_resources.amount('ElectricCharge') * 100 / max_el
+			display_data[str(INFO_PERCENTAGE_BATTERY)] = int(stage_resources.amount('ElectricCharge') * 100 / max_el)
+		else:
+			display_data[str(INFO_PERCENTAGE_BATTERY)] = 0
 		display_data = self.add_orbit_to_status(display_data)
 		display_data = self.add_landing_info(display_data)
 		return display_data
@@ -265,7 +275,7 @@ def send_serial( command, send_data, chunksize=400):
 
 def decode_json_array(arr):
 	res={}
-	print(len(arr))
+#	print(len(arr))
 	for index in range( 0, len(arr), 2):
 #		if int(arr[index])>7:
 		res[arr[index]]=arr[index+1]
@@ -421,7 +431,6 @@ def expand_solar_arrays( vessel, value):
 
 def check_input_and_feedback( data, key_str, key, control):
 	global args
-	global conn
 	if key in data and not args.noksp:
 		if bool(data[key]):
 			setattr( control, key_str, not getattr( control, key_str))
@@ -537,11 +546,12 @@ def work_on_json(input_data):
 #		pass
 
 # main
+conn=""
 def main_function():
 	global ser
 	global args
-	global conn
 	global state
+	global conn
 	global telemetry
 	global perf_data
 
