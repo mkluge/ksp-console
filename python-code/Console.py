@@ -15,7 +15,7 @@ import signal
 
 #port = "COM4"
 #port = "/dev/ttyS6"
-port = "/dev/ttyS4"
+port = "/dev/ttyACM0"
 ser = ""
 args = ""
 
