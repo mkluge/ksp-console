@@ -1,33 +1,47 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+
+    Python interface between Kerbal Space Program
+    an a home grown hardware console
+
+"""
+
 import datetime
-import krpc
-import os
-import serial
 from time import sleep
 import sys
 import json
 import argparse
+import serial
+import krpc
 from ksp_console import *
-import signal
 
+# pylint: disable=no-member
 
-#port = "COM4"
-#port = "/dev/ttyS6"
-port = "/dev/ttyACM0"
-ser = ""
-args = ""
+PORT = "/dev/ttyACM0"
+SER = object
+ARGS = object
+STATE = object
+TELEMETRY = object
+PERF_DATA = object
 
 
 class PerfData:
+    """ collect performance data for tuning
+    """
+
     def __init__(self):
         self.clear()
 
-    def startTimer(self, name):
+    def start_timer(self, name):
+        """ starts one timer
+        """
         self.timers[name] = datetime.datetime.now()
 
-    def stopTimer(self, name):
+    def stop_timer(self, name):
+        """ stops one timer
+        """
         stop = datetime.datetime.now()
         if not name in self.timers.keys():
             print("can't stop timer %s, has not been started yet" % (name))
@@ -38,65 +52,86 @@ class PerfData:
         del self.timers[name]
 
     def set(self, key, value):
+        """ sets one value
+        """
         self.values[key] = value
 
     def clear(self):
+        """ clears all result values
+        """
         self.values = {}
         self.timers = {}
 
     def dump(self):
-        for key in self.values.keys():
+        """ prints all results to stdout
+        """
+        for key in self.values:
             print("%s: %.2f ms" % (key, self.values[key]))
 
 
 class Telemetry:
-    def __init__(self, conn, args):
+    """ stup and contain all telemetry about a vessel
+    """
+    conn = krpc.Client
+    prog_args = ""
+    vessel = ""
+    control = ""
+    orbit = ""
+    altitude = ""
+    apoapsis = ""
+    speed = ""
+    sas = ""
+    rcs = ""
+    lights = ""
+    gear = ""
+    brakes = ""
+
+    def __init__(self, conn, prog_args):
         self.conn = conn
-        self.args = args
+        self.prog_args = prog_args
         self.init_vessel()
 
     def init_vessel(self):
+        """ init telemetry data for a new active vessel
+            always grabs the active vessel
+        """
         try:
-            conn = self.conn
-            self.vessel = conn.space_center.active_vessel
+            self.vessel = self.conn.space_center.active_vessel
             self.control = self.vessel.control
             self.orbit = self.vessel.orbit
             # Set up streams for telemetry
-            self.ut = conn.add_stream(getattr, conn.space_center, 'ut')
-            self.altitude = conn.add_stream(
+            self.altitude = self.conn.add_stream(
                 getattr, self.vessel.flight(), 'surface_altitude')
-            self.apoapsis = conn.add_stream(
+            self.apoapsis = self.conn.add_stream(
                 getattr, self.vessel.orbit, 'apoapsis_altitude')
-            self.speed = conn.add_stream(getattr, self.vessel.flight(
+            self.speed = self.conn.add_stream(getattr, self.vessel.flight(
                 self.vessel.orbit.body.reference_frame), 'speed')
-            self.sas = conn.add_stream(getattr, self.control, 'sas')
-            self.rcs = conn.add_stream(getattr, self.control, 'rcs')
-            self.lights = conn.add_stream(getattr, self.control, 'lights')
-            self.gear = conn.add_stream(getattr, self.control, 'gear')
-            self.brakes = conn.add_stream(getattr, self.control, 'brakes')
+            self.sas = self.conn.add_stream(getattr, self.control, 'sas')
+            self.rcs = self.conn.add_stream(getattr, self.control, 'rcs')
+            self.lights = self.conn.add_stream(getattr, self.control, 'lights')
+            self.gear = self.conn.add_stream(getattr, self.control, 'gear')
+            self.brakes = self.conn.add_stream(getattr, self.control, 'brakes')
         except krpc.error.RPCError:
             self.vessel = "none"
-            pass
 
     def add_action_group_status(self, status_updates):
-        if not self.args.noksp:
-            if self.conn.krpc.current_game_scene != conn.krpc.GameScene.flight:
-                return
-            try:
-                #vessel = self.conn.space_center.active_vessel
-                control = self.vessel.control
-    #			print("status of all groups is "+str(status))
-    #			sys.stdout.flush()
-            except krpc.error.RPCError:
-                pass
-            except ValueError:
-                pass
+        """ add the status of the action groups to the
+            status updates
+
+            TODO: not implemented yet
+        """
+        if not self.prog_args.noksp:
+            if self.conn.krpc.current_game_scene != self.conn.krpc.GameScene.flight:
+                return status_updates
         return status_updates
 
     def add_orbit_to_status(self, status_updates):
-        if not args.noksp:
-            if self.conn.krpc.current_game_scene != conn.krpc.GameScene.flight:
-                return
+        """ adds information about the current orbit parameters
+            to the status
+        """
+        if not self.prog_args.noksp:
+            if self.conn.krpc.current_game_scene != self.conn.krpc.GameScene.flight:
+                return status_updates
             status_updates[str(INFO_PERIAPSIS)] = "n/a"
             status_updates[str(INFO_PERIAPSIS_TIME)] = "n/a"
             try:
@@ -119,16 +154,19 @@ class Telemetry:
         return status_updates
 
     def add_landing_info(self, status_updates):
-        if not self.args.noksp:
-            if self.conn.krpc.current_game_scene != conn.krpc.GameScene.flight:
-                return
+        """ adds information about a possible landing
+            to the status update
+        """
+        if not self.prog_args.noksp:
+            if self.conn.krpc.current_game_scene != self.conn.krpc.GameScene.flight:
+                return status_updates
             try:
                 flight = self.conn.space_center.active_vessel.flight()
                 status_updates[str(INFO_SURFACE_HEIGHT)] = int(
                     flight.surface_altitude)
                 speed = int(self.conn.space_center.active_vessel.flight(
                     self.conn.space_center.active_vessel.orbit.body.reference_frame).vertical_speed)
-                if(speed < 0.0):
+                if speed < 0.0:
                     status_updates[str(INFO_SURFACE_TIME)] = time_to_string(
                         int(flight.surface_altitude/abs(speed)))
                 else:
@@ -140,11 +178,13 @@ class Telemetry:
         return status_updates
 
     def add_main_data(self, status_updates):
+        """ adds all the standard data to the status updates
+        """
         # if we do not have a vessel: test, if we can get one
         if self.vessel == "none":
             self.init_vessel()
             if self.vessel == "none":
-                return
+                return status_updates
         # did the vessel change? then update streams
         if self.vessel != self.conn.space_center.active_vessel:
             self.init_vessel()
@@ -159,20 +199,22 @@ class Telemetry:
         status_updates = self.add_action_group_status(status_updates)
         return status_updates
 
-    def add_display_data(self):
+    def generate_display_data(self):
+        """ adds more data about the ships status to the status
+            update. data is for the two pixel displays
+        """
         display_data = {}
         # if we do not have a vessel: test, if we can get one
         if self.vessel == "none":
             self.init_vessel()
             if self.vessel == "none":
-                return
+                return display_data
         # did the vessel change? then update streams
         if self.vessel != self.conn.space_center.active_vessel:
             self.init_vessel()
 
         display_data[str(INFO_HEIGHT)] = int(self.altitude())
         display_data[str(INFO_SPEED)] = int(self.speed())
-#		stage_resources = self.vessel.resources_in_decouple_stage(stage=self.control.current_stage, cumulative=False)
         stage_resources = self.vessel.resources
         max_lf = stage_resources.max('LiquidFuel')
         max_ox = stage_resources.max('Oxidizer')
@@ -204,23 +246,46 @@ class Telemetry:
 
 
 class State:
+    """ contains information about the current status
+        of the game and the ship
+    """
+
+    last_scene = ""
+    # 0 means -> slider
+    # 1 means 100 from button
+    # 2 means 0 from button
+    thrust_state = 0
+    last_thrust_from_slider = 0
+    sas_mode_list = []
+    current_sas_mode = 0
+    current_speed_mode = 0
+    speed_mode_list = []
+    num_speed_modes = 0
+    # whether sas was on before the joystick values where
+    # feed into ksp
+    last_yaw = 0
+    last_pitch = 0
+    last_roll = 0
+    was_sas_on = False
+    last_sas_type = 0
+    joystick_sas_has_been_handled = False
+
     def __init__(self, conn):
-        self.last_scene = ""
         # 0 means -> slider
         # 1 means 100 from button
         # 2 means 0 from button
         self.thrust_state = 0
         self.last_thrust_from_slider = 0
-        s = conn.space_center.SASMode
+        sasm = conn.space_center.SASMode
         self.sas_mode_list = [
-            s.stability_assist, s.maneuver,
-            s.prograde, s.retrograde, s.normal, s.anti_normal,
-            s.radial, s.anti_radial, s.target, s.anti_target]
+            sasm.stability_assist, sasm.maneuver,
+            sasm.prograde, sasm.retrograde, sasm.normal, sasm.anti_normal,
+            sasm.radial, sasm.anti_radial, sasm.target, sasm.anti_target]
         self.current_sas_mode = 0
         self.num_sas_modes = len(self.sas_mode_list)
-        s = conn.space_center.SpeedMode
+        spem = conn.space_center.SpeedMode
         self.current_speed_mode = 0
-        self.speed_mode_list = [s.orbit, s.surface, s.target]
+        self.speed_mode_list = [spem.orbit, spem.surface, spem.target]
         self.num_speed_modes = len(self.speed_mode_list)
         # whether sas was on before the joystick values where
         # feed into ksp
@@ -232,21 +297,24 @@ class State:
         self.joystick_sas_has_been_handled = False
 
 
-def serial_read_line():
-    global ser
+def serial_read_line(port):
+    """ reads data from the serial line until we get
+        an "\n" as a terminator
+    """
     serial_data = ""
     while True:
-        data = ser.read(1)
+        data = port.read(1)
         if len(data) > 0:
             data = data.decode('iso8859-1')
             if data == '\n':
                 return serial_data
             serial_data += data
 
-# auf -1 ... 1 normieren
-
 
 def normiere_joystick(value):
+    """ normalizes the console input to what krpc
+        wants for the game ( 1 ... -1 )
+    """
     if value > 512:
         value = 512
     if value < -512:
@@ -257,6 +325,9 @@ def normiere_joystick(value):
 
 
 def normiere_throttle(value):
+    """ normalizes throttle values from console
+        to game/krpc input
+    """
     if value < 20:
         return 0
     if value > 890:
@@ -265,40 +336,49 @@ def normiere_throttle(value):
 
 
 def send_handshake():
+    """ sends the initial handshake to the console
+        so that it starts
+    """
     send_data = {}
     send_data["start"] = 2016
     send_serial(CMD_INIT, send_data)
 
 
 def send_serial(command, send_data, chunksize=32):
-    global args
-    global ser
+    """ sends data and take care of chunking and
+        some delay between chunks
+    """
+    global ARGS
+    global SER
     send_data["cmd"] = command
     data = json.dumps(send_data, separators=(',', ':'))+'+'
     data = data.encode('iso8859-1')
-    if args.debugsend:
+    if ARGS.debugsend:
         print("sending %d bytes " % len(data))
         print("send: "+str(data))
         sys.stdout.flush()
     # got to send in chunks to avoid loosing stuff
     # (if needed)
-    while(len(data) > 0):
+    while len(data) > 0:
         send_pkt = data[:chunksize]
         data = data[chunksize:]
-        ser.write(send_pkt)
+        SER.write(send_pkt)
         # wait between packets ...
         sleep(0.05)
-        if args.debugsend:
-            print("packet out:" +str(send_pkt))
+        if ARGS.debugsend:
+            print("packet out:" + str(send_pkt))
     # check the response
     response = ""
-    while(len(response) != 2):
-        response += ser.read(1).decode('iso8859-1')
+    while len(response) != 2:
+        response += SER.read(1).decode('iso8859-1')
     if response != "OK":
         print("got the wrong ACK for the serial protocol: " + response)
 
 
 def decode_json_array(arr):
+    """ decodes an array from the console to an
+        dictionary as used here
+    """
     res = {}
 #	print(len(arr))
     for index in range(0, len(arr), 2):
@@ -308,6 +388,9 @@ def decode_json_array(arr):
 
 
 def encode_json_array(arr):
+    """ encodes an dictionary as used here
+        to an array as used by the console
+    """
     res = []
     for element in arr:
         res.append(int(element))
@@ -315,10 +398,12 @@ def encode_json_array(arr):
     return res
 
 
-def send_display_update(status_updates):
-    global args
-    global conn
-    if not args.noksp:
+def send_display_update(conn, status_updates):
+    """ generates and sends data necessary for udpating
+        the displays to the console
+    """
+    global ARGS
+    if not ARGS.noksp:
         if conn.krpc.current_game_scene != conn.krpc.GameScene.flight:
             return
         try:
@@ -328,11 +413,12 @@ def send_display_update(status_updates):
             pass
 
 
-def send_main_update(status_updates):
-    global args
-    global conn
-    if not args.noksp:
-        if conn.krpc.current_game_scene != conn.krpc.GameScene.flight:
+def send_main_update(connection, status_updates):
+    """ sends update from the game to the console
+    """
+    global ARGS
+    if not ARGS.noksp:
+        if connection.krpc.current_game_scene != connection.krpc.GameScene.flight:
             return
         try:
             send_data = encode_json_array(status_updates)
@@ -342,6 +428,8 @@ def send_main_update(status_updates):
 
 
 def time_to_string(secs):
+    """ convert time data to a nice string
+    """
     if secs < 0:
         return "n/a"
     tap = ""
@@ -357,115 +445,146 @@ def time_to_string(secs):
 
 
 def check_input(data, key, fun, *fargs):
-    global args
-    if key in data and not args.noksp:
+    """ calls a function, if a certain data point is set
+        in the data delivered from the console
+    """
+    global ARGS
+    if key in data and not ARGS.noksp:
         if data[key] == 1:
             fun(*fargs)
 
 
 def enable_all_engines(vessel, value):
-    global args
-    if not args.noksp:
-        for e in vessel.parts.engines:
-            e.active = value
+    """ enables all engines on the vessel
+    """
+    global ARGS
+    if not ARGS.noksp:
+        for engine in vessel.parts.engines:
+            engine.active = value
 
 
 def chutes_go(vessel):
-    global args
-    if not args.noksp:
-        for p in vessel.parts.parachutes:
-            print("1")
-            p.deploy()
-    print("chutes")
-    sys.stdout.flush()
+    """ deploys all available chutes at the vessel
+    """
+    global ARGS
+    if not ARGS.noksp:
+        for chute in vessel.parts.parachutes:
+            chute.deploy()
 
 
 def full_thrust(vessel):
-    global state
+    """ full power to all engines
+    """
+    global STATE
     control = vessel.control
-    if state.thrust_state == 0:
-        state.last_thrust_from_slider = control.throttle
+    if STATE.thrust_state == 0:
+        STATE.last_thrust_from_slider = control.throttle
     control.throttle = 1
-    state.thrust_state = 1
+    STATE.thrust_state = 1
 
 
 def zero_thrust(vessel):
-    global state
+    """ all engines to zero power
+    """
+    global STATE
     control = vessel.control
-    if state.thrust_state == 0:
-        state.last_thrust_from_slider = control.throttle
+    if STATE.thrust_state == 0:
+        STATE.last_thrust_from_slider = control.throttle
     control.throttle = 0
-    state.thrust_state = 2
+    STATE.thrust_state = 2
 
 
 def button_abort(vessel):
+    """ abort button pressed
+        TODO: implement or delete
+    """
     return
 
 
 def button_fuel(vessel):
+    """ fuel button pressed
+        TODO: implement or delete
+    """
     return
 
 
 def button_reaction_wheels(vessel):
-    global args
-    if not args.noksp:
-        for r in vessel.parts.reaction_wheels:
-            if r.active == True:
-                r.active = False
+    """ switch the state of all reaction wheels in
+        the vessel
+    """
+    global ARGS
+    if not ARGS.noksp:
+        for wheel in vessel.parts.reaction_wheels:
+            if wheel.active:
+                wheel.active = False
             else:
-                r.active = True
+                wheel.active = True
 
 
-def camera_button():
+def camera_button(conn):
+    """ switch the camera mode
+    """
     camera = conn.space_center.camera
     if camera.mode == conn.space_center.CameraMode.map:
         camera.mode = conn.space_center.CameraMode.automatic
     else:
         camera.mode = conn.space_center.CameraMode.map
-    return
 
 
 def button_test(vessel):
+    """ TEST button pressed
+        TODO: implement or delete
+    """
     return
 
 
 def button_eva(vessel):
+    """ EVA button pressed
+        TODO: implement or delete
+    """
     return
 
 
 def button_iva(vessel):
+    """ IVA button pressed
+        TODO: implement or delete
+    """
     return
 
 
 def next_sas_mode(vessel):
-    global state
+    """ switch to the next SAS mode
+    """
+    global STATE
     # if sas was off, just enable it
     control = vessel.control
-    if control.sas == False:
+    if not control.sas:
         control.sas = True
         return
-    next_mode = state.current_sas_mode+1
-    if next_mode == state.num_sas_modes:
+    next_mode = STATE.current_sas_mode+1
+    if next_mode == STATE.num_sas_modes:
         next_mode = 0
-    control.sas_mode = state.sas_mode_list[next_mode]
-    state.current_sas_mode = next_mode
-    return
+    control.sas_mode = STATE.sas_mode_list[next_mode]
+    STATE.current_sas_mode = next_mode
 
 
 def next_speed_mode(vessel):
-    global state
+    """ switch to the next speed mode
+    """
+    global STATE
     control = vessel.control
-    next_mode = state.current_speed_mode+1
-    if next_mode == state.num_speed_modes:
+    next_mode = STATE.current_speed_mode+1
+    if next_mode == STATE.num_speed_modes:
         next_mode = 0
-    control.speed_mode = state.speed_mode_list[next_mode]
-    state.current_speed_mode = next_mode
-    return
+    control.speed_mode = STATE.speed_mode_list[next_mode]
+    STATE.current_speed_mode = next_mode
 
 
 def expand_solar_arrays(vessel, value):
-    global args
-    if not args.noksp:
+    """ deploy or retract all solar arrays
+    """
+    global ARGS
+    if not ARGS.noksp:
         for solar in vessel.parts.solar_panels:
             try:
                 solar.deployed = value
@@ -474,60 +593,43 @@ def expand_solar_arrays(vessel, value):
 
 
 def check_input_and_feedback(data, key_str, key, control):
-    global args
-    if key in data and not args.noksp:
+    """ sends values from the console to the game
+    """
+    global ARGS
+    if key in data and not ARGS.noksp:
         if bool(data[key]):
             setattr(control, key_str, not getattr(control, key_str))
 
 
 def check_analog(data, key, control, ckey):
-    global state
-#	sas_off_limit=0.15
+    """ checks analog data from the joysticks ans
+        send them to the game
+    """
+    global STATE
     if key in data:
         value = normiere_joystick(data[key])
-        if not args.noksp:
-            #			# if SAS is on and we have rotation, disable yaw
-            #			# and steer
-            #			if key==KSP_INPUT_YAW:
-            #				state.last_yaw=value
-            #			if key==KSP_INPUT_ROLL:
-            #				state.last_roll=value
-            #			if key==KSP_INPUT_PITCH:
-            #				state.last_pitch=value
-            #			if abs(state.last_yaw)>sas_off_limit or abs(state.last_roll)>sas_off_limit or abs(state.last_pitch)>sas_off_limit:
-            #				if state.joystick_sas_has_been_handled==False:
-            #				   	if control.sas==True:
-            #						state.last_sas_type = control.sas_mode
-            #						state.was_sas_on = True
-            #						control.sas = False
-            #					else:
-            #						state.was_sas_on = False
-            #					state.joystick_sas_has_been_handled=True
-            #			else:
-            #				if state.was_sas_on == True:
-            #					control.sas = True
-            #					control.sas_mode = state.last_sas_type
-            #					state.sas_was_on = False
-            #				state.joystick_sas_has_been_handled = False
+        if not ARGS.noksp:
             setattr(control, ckey, value)
 
 
-def work_on_json(input_data):
-    global args
-    global conn
-    global state
+def work_on_json(conn, input_data):
+    """ takes the json data from the console, analyzes it, and
+        sends it to the game
+    """
+    global ARGS
+    global STATE
 
-    if not args.noksp:
+    if not ARGS.noksp:
         if conn.krpc.current_game_scene != conn.krpc.GameScene.flight:
             return
     try:
         json_data = json.loads(input_data)
         data = decode_json_array(json_data["data"])
-        if args.debugrecv:
+        if ARGS.debugrecv:
             if len(data) > 0:
                 print(data)
                 sys.stdout.flush()
-        if args.noksp:
+        if ARGS.noksp:
             return
         vessel = conn.space_center.active_vessel
         control = vessel.control
@@ -537,17 +639,17 @@ def work_on_json(input_data):
         check_analog(data, KSP_INPUT_YAW, control, "yaw")
         check_analog(data, KSP_INPUT_PITCH, control, "pitch")
         check_analog(data, KSP_INPUT_ROLL, control, "roll")
-        if args.debugrecv:
+        if ARGS.debugrecv:
             print(data)
             sys.stdout.flush()
         if KSP_INPUT_THRUST in data:
             value = normiere_throttle(data[KSP_INPUT_THRUST])
-            if state.thrust_state == 0:
+            if STATE.thrust_state == 0:
                 control.throttle = value
             else:
                 # only set if slider has been moved
-                if abs(state.last_thrust_from_slider-value) > 0.05:
-                    state.thrust_state = 0
+                if abs(STATE.last_thrust_from_slider-value) > 0.05:
+                    STATE.thrust_state = 0
                     control.throttle = value
         if BUTTON_STAGE in data and data[BUTTON_STAGE] == 1:
             control.activate_next_stage()
@@ -592,7 +694,7 @@ def work_on_json(input_data):
                     lambda: button_reaction_wheels(vessel))
         check_input(data, BUTTON_STORE, lambda: conn.space_center.quicksave())
         check_input(data, BUTTON_LOAD, lambda: conn.space_center.quickload())
-        check_input(data, BUTTON_CAMERA, lambda: camera_button())
+        check_input(data, BUTTON_CAMERA, lambda: camera_button(conn))
         check_input(data, BUTTON_TEST, lambda: button_test(vessel))
         check_input(data, BUTTON_EVA, lambda: button_eva(vessel))
         check_input(data, BUTTON_IVA, lambda: button_iva(vessel))
@@ -607,19 +709,17 @@ def work_on_json(input_data):
 #		pass
 
 
-# main
-conn = ""
-
-
 def main_function():
-    global ser
-    global args
-    global state
-    global conn
-    global telemetry
-    global perf_data
+    """ the "way to large" main function
+        TODO: fix this, make classes an so on
+    """
+    global SER
+    global ARGS
+    global STATE
+    global TELEMETRY
+    global PERF_DATA
 
-    perf_data = PerfData()
+    PERF_DATA = PerfData()
     last_chip_data = 0
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -630,7 +730,7 @@ def main_function():
         "--debugchip", help="print chip debug output", action="store_true")
     parser.add_argument(
         "--noksp", help="run without connecting to ksp", action="store_true")
-    args = parser.parse_args()
+    ARGS = parser.parse_args()
 
     serial_connected = False
     krpc_connected = False
@@ -638,20 +738,19 @@ def main_function():
     while True:
         try:
             # first: try to connect everything
-            if krpc_connected == False and not args.noksp:
+            if not krpc_connected and not ARGS.noksp:
                 conn = krpc.connect(name='mk console')
-                state = State(conn)
-                telemetry = Telemetry(conn, args)
+                STATE = State(conn)
+                TELEMETRY = Telemetry(conn, ARGS)
                 krpc_connected = True
                 ref_time = datetime.datetime.now()
         except (krpc.error.RPCError, ConnectionRefusedError):
             krpc_connected = False
-            pass
 
         try:
-            if serial_connected == False:
+            if not serial_connected:
                 print("trying serial")
-                ser = serial.Serial(port, 115200, timeout=2)
+                ser = serial.Serial(PORT, 115200, timeout=2)
                 ser.reset_input_buffer()
                 ser.reset_output_buffer()
                 sleep(5)
@@ -662,7 +761,6 @@ def main_function():
         except (serial.SerialException, ConnectionRefusedError):
             print("serial failed")
             serial_connected = False
-            pass
 
         try:
             should_send = False
@@ -685,26 +783,25 @@ def main_function():
                     # wait for the reply and done
 
                     # every 1-2 seconds: send update to the arduino
-                    # if (time_diff.seconds>1 or time_diff.microseconds>300000) and ser.out_waiting == 0:
-                    if (time_diff.seconds > 1):
+                    if time_diff.seconds > 1:
                         if conn.krpc.current_game_scene == conn.krpc.GameScene.flight:
                             # send main controller data
                             main_updates = {}
-                            perf_data.startTimer("collectMainData")
-                            main_updates = telemetry.add_main_data(
+                            PERF_DATA.start_timer("collectMainData")
+                            main_updates = TELEMETRY.add_main_data(
                                 main_updates)
-                            perf_data.stopTimer("collectMainData")
-                            perf_data.startTimer("sendMainUpdates")
-                            send_main_update(main_updates)
-                            perf_data.stopTimer("sendMainUpdates")
+                            PERF_DATA.stop_timer("collectMainData")
+                            PERF_DATA.start_timer("sendMainUpdates")
+                            send_main_update(conn, main_updates)
+                            PERF_DATA.stop_timer("sendMainUpdates")
                             # every second time: also send display update
-                            if should_send == True:
-                                perf_data.startTimer("collectDisplayData")
-                                display_updates = telemetry.add_display_data()
-                                perf_data.stopTimer("collectDisplayData")
-                                perf_data.startTimer("sendDisplayUpdates")
-                                send_display_update(display_updates)
-                                perf_data.stopTimer("sendDisplayUpdates")
+                            if should_send:
+                                PERF_DATA.start_timer("collectDisplayData")
+                                display_updates = TELEMETRY.generate_display_data()
+                                PERF_DATA.stop_timer("collectDisplayData")
+                                PERF_DATA.start_timer("sendDisplayUpdates")
+                                send_display_update(conn, display_updates)
+                                PERF_DATA.stop_timer("sendDisplayUpdates")
                                 should_send = False
 # disabled to omit sending display data
                             else:
@@ -712,17 +809,17 @@ def main_function():
                         ref_time = now
 
                     # read the current status and button updates and so on
-                    perf_data.startTimer("update process")
-                    perf_data.startTimer("send GET_UPDATES")
+                    PERF_DATA.start_timer("update process")
+                    PERF_DATA.start_timer("send GET_UPDATES")
                     send_serial(CMD_GET_UPDATES, {})
-                    perf_data.stopTimer("send GET_UPDATES")
-                    perf_data.startTimer("readline")
-                    serial_data = serial_read_line()
-                    perf_data.stopTimer("readline")
-                    if args.debugrecv:
+                    PERF_DATA.stop_timer("send GET_UPDATES")
+                    PERF_DATA.start_timer("readline")
+                    serial_data = serial_read_line(SER)
+                    PERF_DATA.stop_timer("readline")
+                    if ARGS.debugrecv:
                         print(serial_data)
                         sys.stdout.flush()
-                    if args.debugchip:
+                    if ARGS.debugchip:
                         try:
                             data = json.loads(serial_data)
                             if "chip" in data and data["chip"] != last_chip_data:
@@ -730,13 +827,13 @@ def main_function():
                                 last_chip_data = data["chip"]
                                 sys.stdout.flush()
                         except ValueError:
-                            print('Decoding JSON failed for: '+lines[0])
-                    perf_data.startTimer("workJson")
-                    work_on_json(serial_data)
-                    perf_data.stopTimer("workJson")
-                    perf_data.stopTimer("update process")
-                    perf_data.dump()
-                    perf_data.clear()
+                            print('Decoding JSON failed for: '+data)
+                    PERF_DATA.start_timer("workJson")
+                    work_on_json(conn, serial_data)
+                    PERF_DATA.stop_timer("workJson")
+                    PERF_DATA.stop_timer("update process")
+                    PERF_DATA.dump()
+                    PERF_DATA.clear()
             else:
                 # not everything connected, sleep and try again
                 print("Connection missing: KRPC:%s Serial:%s\n" %
@@ -745,10 +842,8 @@ def main_function():
                 sleep(1)
         except (krpc.error.RPCError, ConnectionRefusedError):
             krpc_connected = False
-            pass
         except serial.SerialException:
             serial_connected = False
-            pass
 
 
 if __name__ == '__main__':
