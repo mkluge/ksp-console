@@ -750,9 +750,9 @@ def main_function():
         try:
             if not serial_connected:
                 print("trying serial")
-                ser = serial.Serial(PORT, 115200, timeout=2)
-                ser.reset_input_buffer()
-                ser.reset_output_buffer()
+                SER = serial.Serial(PORT, 115200, timeout=2)
+                SER.reset_input_buffer()
+                SER.reset_output_buffer()
                 sleep(5)
                 print("sending handshake")
                 send_handshake()
